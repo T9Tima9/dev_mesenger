@@ -596,6 +596,7 @@
             renderDevFul();
             setupMediaHandlers();
             setupDevTokSwipe();
+            playActiveDevTokVideo();
         }
 
         function switchTab(screenId, button) {
@@ -614,17 +615,34 @@
 
         // ===== МЕССЕНДЖЕР =====
         function searchUser() {
-            const searchVal = document.getElementById('userSearchInput').value.trim().toLowerCase();
-            let username = searchVal.startsWith('@') ? searchVal : '@' + searchVal;
+            const searchVal = document.getElementById('userSearchInput').value.trim();
+            if (!searchVal) return;
 
-            if (username === currentUser) {
-                alert('Это вы сами!');
+            let username = searchVal.toLowerCase();
+            let user = null;
+
+            if (username.startsWith('@')) {
+                user = CloudDB.getUser(username);
+            } else if (username.includes('@')) {
+                user = CloudDB.getUserByEmail(username);
+                if (user) username = user.username;
+            } else {
+                user = CloudDB.getUser('@' + username);
+                if (!user) {
+                    user = CloudDB.getUserByEmail(searchVal);
+                    if (user) username = user.username;
+                } else {
+                    username = '@' + username;
+                }
+            }
+
+            if (!user || user.deleted) {
+                alert('Пользователь не найден');
                 return;
             }
 
-            let user = CloudDB.getUser(username);
-            if (!user || user.deleted) {
-                alert('Пользователь не найден');
+            if (username === currentUser) {
+                alert('Это вы сами!');
                 return;
             }
 
@@ -870,10 +888,14 @@
             const viewport = document.getElementById('devtokViewport');
             viewport.innerHTML = '';
 
-            let toks = CloudDB.getVideos('devtok');
+            let toks = CloudDB.getVideos('devtok').filter(t => t.src || videoBlobsStorage[t.id]);
             if (toks.length === 0) {
                 viewport.innerHTML = '<div style="color: #666; font-size: 14px;">Видео еще не загружены</div>';
                 return;
+            }
+
+            if (currentDevTokIndex >= toks.length) {
+                currentDevTokIndex = 0;
             }
 
             toks.forEach((t, idx) => {
@@ -928,8 +950,9 @@
             viewport.addEventListener('touchend', (e) => {
                 const currentY = e.changedTouches[0].clientY;
                 const diff = lastTouchY - currentY;
-                const toks = CloudDB.getVideos('devtok');
+                const toks = CloudDB.getVideos('devtok').filter(t => t.src || videoBlobsStorage[t.id]);
 
+                if (toks.length === 0) return;
                 if (Math.abs(diff) > 50) {
                     if (diff > 0) {
                         // Свайп вверх = новое видео (следующее)
@@ -946,7 +969,8 @@
             // Также поддерживаем колесо мыши
             viewport.addEventListener('wheel', (e) => {
                 e.preventDefault();
-                const toks = CloudDB.getVideos('devtok');
+                const toks = CloudDB.getVideos('devtok').filter(t => t.src || videoBlobsStorage[t.id]);
+                if (toks.length === 0) return;
                 
                 if (e.deltaY > 0) {
                     // Вниз на колесе = новое видео
@@ -965,7 +989,7 @@
             const grid = document.getElementById('devfulGrid');
             grid.innerHTML = '';
 
-            let fuls = CloudDB.getVideos('devful');
+            let fuls = CloudDB.getVideos('devful').filter(f => f.src || videoBlobsStorage[f.id]);
             if (fuls.length === 0) {
                 grid.innerHTML = '<div style="color: #666; padding: 20px;">Видео еще не загружены</div>';
                 return;
@@ -998,37 +1022,40 @@
             const file = e.target.files[0];
             if (!file) return;
 
-            const blobUrl = URL.createObjectURL(file);
-            const videoId = "video_" + Date.now();
-            videoBlobsStorage[videoId] = blobUrl;
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const fileData = event.target.result;
+                const videoId = "video_" + Date.now();
 
-            if (uploadTarget === 'devtok') {
-                let toks = CloudDB.getVideos('devtok');
-                toks.unshift({
-                    id: videoId,
-                    author: currentUser,
-                    src: "",
-                    desc: file.name.split('.')[0]
-                });
-                CloudDB.saveVideoList('devtok', toks);
+                if (uploadTarget === 'devtok') {
+                    let toks = CloudDB.getVideos('devtok');
+                    toks.unshift({
+                        id: videoId,
+                        author: currentUser,
+                        src: fileData,
+                        desc: file.name.split('.')[0]
+                    });
+                    CloudDB.saveVideoList('devtok', toks);
 
-                currentDevTokIndex = 0;
-                renderDevTok();
-                playActiveDevTokVideo();
-            } else {
-                let fuls = CloudDB.getVideos('devful');
-                fuls.unshift({
-                    id: videoId,
-                    author: currentUser,
-                    src: "",
-                    title: file.name.split('.')[0]
-                });
-                CloudDB.saveVideoList('devful', fuls);
-                renderDevFul();
-            }
+                    currentDevTokIndex = 0;
+                    renderDevTok();
+                    playActiveDevTokVideo();
+                } else {
+                    let fuls = CloudDB.getVideos('devful');
+                    fuls.unshift({
+                        id: videoId,
+                        author: currentUser,
+                        src: fileData,
+                        title: file.name.split('.')[0]
+                    });
+                    CloudDB.saveVideoList('devful', fuls);
+                    renderDevFul();
+                }
 
-            alert('✅ Видео загружено в ленту!');
-            this.value = '';
+                alert('✅ Видео загружено в ленту!');
+                document.getElementById('contentVideoLoader').value = '';
+            };
+            reader.readAsDataURL(file);
         });
 
         // ===== ПРОФИЛЬ =====
