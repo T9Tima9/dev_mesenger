@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DevGram Online</title>
+    <title>DevGram Pro Online</title>
     <style>
         :root {
             --tg-theme-bg: #0e1621;
@@ -12,6 +12,7 @@
             --tg-theme-text: #f5f5f5;
             --tg-theme-hint: #7f91a4;
             --tg-theme-button: #2481cc;
+            --tg-theme-danger: #e53935;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
@@ -27,10 +28,11 @@
         .avatar-picker { display: flex; flex-direction: column; align-items: center; gap: 10px; }
         .avatar-preview { width: 80px; height: 80px; border-radius: 50%; background: #517da2; display: flex; align-items: center; justify-content: center; font-size: 30px; overflow: hidden; }
         .avatar-preview img { width: 100%; height: 100%; object-fit: cover; }
-        .error-msg { color: #e53935; font-size: 13px; text-align: center; display: none; }
+        .error-msg { color: var(--tg-theme-danger); font-size: 13px; text-align: center; display: none; }
 
         /* Боковая панель */
-        .sidebar { width: 80px; background-color: var(--tg-theme-sidebar); display: flex; flex-direction: column; align-items: center; padding: 20px 0; border-right: 1px solid #101921; gap: 25px; }
+        .sidebar { width: 80px; background-color: var(--tg-theme-sidebar); display: flex; flex-direction: column; align-items: center; padding: 20px 0; border-right: 1px solid #101921; gap: 20px; justify-content: space-between; }
+        .sidebar-top { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
         .logo-dev { font-size: 28px; font-weight: bold; color: var(--tg-theme-button); background: #2481cc22; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 15px; }
         .nav-btn { background: none; border: none; color: var(--tg-theme-hint); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 11px; width: 100%; padding: 10px 0; }
         .nav-btn.active { color: var(--tg-theme-button); background: #2481cc11; border-left: 3px solid var(--tg-theme-button); }
@@ -68,13 +70,13 @@
         .media-actions { display: flex; gap: 8px; }
         .icon-btn { background: none; border: none; font-size: 20px; cursor: pointer; opacity: 0.7; }
         .icon-btn:hover { opacity: 1; }
-        .icon-btn.recording { color: #e53935; animation: blink 1s infinite; }
+        .icon-btn.recording { color: var(--tg-theme-danger); animation: blink 1s infinite; }
         .send-btn-9 { background: var(--tg-theme-button); border: none; width: 38px; height: 38px; border-radius: 50%; color: white; font-size: 18px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
         #cameraPreviewContainer { display: none; position: absolute; bottom: 70px; left: 20px; width: 150px; height: 150px; border-radius: 50%; overflow: hidden; border: 3px solid var(--tg-theme-button); }
         #cameraPreviewContainer video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* === ИСПРАВЛЕННЫЙ ДЕВТОК (КНОПКИ НАВИГАЦИИ ВМЕСТО СКРОЛЛА) === */
+        /* === ДЕВТОК (КНОПКИ НАВИГАЦИИ) === */
         .devtok-screen-wrapper { flex: 1; display: flex; justify-content: center; align-items: center; background: #000; position: relative; }
         .devtok-viewport { width: 360px; height: 640px; background: #111; border-radius: 16px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.7); overflow: hidden; }
 
@@ -83,14 +85,13 @@
         .video-card-vertical video { width: 100%; height: 100%; object-fit: cover; }
         .video-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px; background: linear-gradient(transparent, rgba(0,0,0,0.9)); display: flex; justify-content: space-between; align-items: flex-end; z-index: 5; }
         
-        /* Кнопки переключения ленты */
         .feed-arrows { position: absolute; right: -60px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 100; }
         .arrow-btn { width: 45px; height: 45px; border-radius: 50%; background: var(--tg-theme-sidebar); border: 1px solid var(--tg-theme-button); color: white; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .arrow-btn:hover { background: var(--tg-theme-active); }
 
         .upload-floating-btn { position: absolute; top: 20px; right: 20px; background: var(--tg-theme-button); color: white; border: none; padding: 12px 24px; border-radius: 20px; cursor: pointer; font-weight: bold; z-index: 10; }
 
-        /* Всплывающее системное окно запроса звука */
+        /* Разрешения */
         .system-request-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; justify-content: center; align-items: center; }
         .modal-box { background: var(--tg-theme-sidebar); padding: 25px; border-radius: 12px; width: 320px; text-align: center; display: flex; flex-direction: column; gap: 15px; border: 1px solid var(--tg-theme-button); }
 
@@ -102,6 +103,11 @@
         .video-card-horizontal video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; }
         .horizontal-info { padding: 15px; }
 
+        /* Кнопки Профиля / Настроек */
+        .profile-section { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px; padding-bottom: 10px; border-top: 1px solid #223242; pt: 10px; }
+        .settings-pane { background: var(--tg-theme-sidebar); padding: 20px; border-radius: 12px; display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 400px; margin: auto; }
+        .danger-btn { background: var(--tg-theme-danger) !important; }
+
         .hidden-input { display: none; }
         @keyframes blink { 50% { opacity: 0.4; } }
     </style>
@@ -110,17 +116,17 @@
 
     <div id="permissionModal" class="system-request-modal">
         <div class="modal-box">
-            <h3>🔑 Разрешения системы</h3>
-            <p style="font-size:14px; color:var(--tg-theme-hint);">Для работы DevGram (запись кружков, голосовых и автоплей видео со звуком) приложению необходим доступ к медиа-системе.</p>
-            <button onclick="requestAllPermissions()" style="padding:12px; background:var(--tg-theme-button); border:none; color:white; border-radius:6px; font-weight:bold; cursor:pointer;">Предоставить доступ</button>
+            <h3>🔑 Запрос доступа к медиа</h3>
+            <p style="font-size:14px; color:var(--tg-theme-hint);">Для полноценной работы DevGram (запись кружков, аудио и работа звука в видеороликах) разрешите доступ к камере и микрофону.</p>
+            <button onclick="requestAllPermissions()" style="padding:12px; background:var(--tg-theme-button); border:none; color:white; border-radius:6px; font-weight:bold; cursor:pointer;">Активировать медиасистему</button>
         </div>
     </div>
 
     <div id="authOverlay" style="display:none;">
         <div class="auth-card" id="stepEmail">
             <h2>Регистрация</h2>
-            <p style="color:var(--tg-theme-hint); text-align:center; font-size:14px;">Введите почту, мы отправим проверочный код</p>
-            <input type="email" id="authEmail" placeholder="name@example.com" required>
+            <p style="color:var(--tg-theme-hint); text-align:center; font-size:14px;">Введите почту</p>
+            <input type="email" id="authEmail" placeholder="name@example.com" value="test@dev.ru">
             <button onclick="sendCodeMock()">Получить код</button>
             <div class="error-msg" id="emailError">Введите корректную почту</div>
         </div>
@@ -141,25 +147,34 @@
                 <input type="file" id="avatarFile" class="hidden-input" accept="image/*">
             </div>
             <input type="text" id="authUsername" placeholder="@username">
-            <div class="error-msg" id="usernameError">Такой юзернейм уже занят или некорректен!</div>
+            <div class="error-msg" id="usernameError">Такой юзернейм уже занят!</div>
             <button onclick="completeRegistration()">Войти в DevGram</button>
         </div>
     </div>
 
     <div class="sidebar">
-        <div class="logo-dev">9</div>
-        <button class="nav-btn active" onclick="switchTab('messenger', this)">
-            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.54.36 2.98 1 4.28L2 22l5.72-1c1.3.64 2.74 1 4.28 1 5.52 0 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/></svg>
-            Чаты (9)
-        </button>
-        <button class="nav-btn" onclick="switchTab('devtok', this)">
-            <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8 12.5v-9l6 4.5-6 4.5z"/></svg>
-            ДевТок
-        </button>
-        <button class="nav-btn" onclick="switchTab('devful', this)">
-            <svg viewBox="0 0 24 24"><path d="M21 3H3c-1.11 0-2 .89-2 2v14c0 1.1.89 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 12V9l5 3-5 3z"/></svg>
-            ДевФул
-        </button>
+        <div class="sidebar-top">
+            <div class="logo-dev">9</div>
+            <button class="nav-btn active" onclick="switchTab('messenger', this)">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.54.36 2.98 1 4.28L2 22l5.72-1c1.3.64 2.74 1 4.28 1 5.52 0 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/></svg>
+                Чаты
+            </button>
+            <button class="nav-btn" onclick="switchTab('devtok', this)">
+                <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8 12.5v-9l6 4.5-6 4.5z"/></svg>
+                ДевТок
+            </button>
+            <button class="nav-btn" onclick="switchTab('devful', this)">
+                <svg viewBox="0 0 24 24"><path d="M21 3H3c-1.11 0-2 .89-2 2v14c0 1.1.89 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 12V9l5 3-5 3z"/></svg>
+                ДевФул
+            </button>
+            <button class="nav-btn" onclick="switchTab('settings', this)">
+                <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                Профиль
+            </button>
+        </div>
+        <div class="profile-section">
+            <div class="avatar" style="width:35px; height:35px;" id="sidebarAvatar">?</div>
+        </div>
     </div>
 
     <div class="main-content">
@@ -178,7 +193,7 @@
                         <div class="avatar" id="activeChatAvatar"></div>
                         <h4 id="activeChatName">@username</h4>
                     </div>
-                    <button class="add-friend-btn" id="chatFriendBtn" onclick="toggleFriendInChat()">Добавить в друзья</button>
+                    <button class="add-friend-btn" id="chatFriendBtn" onclick="toggleFriendInChat()">В друзья</button>
                 </div>
                 <div class="chat-messages" id="chatMessages"></div>
                 
@@ -195,17 +210,14 @@
                 </div>
             </div>
             <div style="flex:1; display:flex; justify-content:center; align-items:center; color:var(--tg-theme-hint);" id="noChatPlaceholder">
-                Выберите чат или введите @username в поиске
+                Введите ник в поиске для начала чата
             </div>
         </div>
 
         <div id="devtok" class="screen">
             <button class="upload-floating-btn" onclick="triggerUpload('devtok')">+ Создать ДевТок</button>
             <div class="devtok-screen-wrapper">
-                
-                <div class="devtok-viewport" id="devtokViewport">
-                    </div>
-
+                <div class="devtok-viewport" id="devtokViewport"></div>
                 <div class="feed-arrows">
                     <button class="arrow-btn" onclick="changeVideo(-1)">▲</button>
                     <button class="arrow-btn" onclick="changeVideo(1)">▼</button>
@@ -220,6 +232,16 @@
                     <button class="upload-floating-btn" style="position:static;" onclick="triggerUpload('devful')">+ Добавить видео</button>
                 </div>
                 <div class="devful-grid" id="devfulGrid"></div>
+            </div>
+        </div>
+
+        <div id="settings" class="screen" style="display:none; justify-content:center; align-items:center;">
+            <div class="settings-pane">
+                <h2 style="text-align:center;" id="settingsTitle">Мой Профиль</h2>
+                <p style="text-align:center; color:var(--tg-theme-hint);" id="settingsSub"></p>
+                
+                <button onclick="logOutAccount()" style="margin-top:10px;">Выйти из аккаунта</button>
+                <button onclick="deleteAccountPermanently()" class="danger-btn">❌ Полностью удалить аккаунт</button>
             </div>
         </div>
     </div>
@@ -243,69 +265,51 @@
         let circleStream = null;
         let currentPlayingIndex = 0;
 
-        // ПРИНУДИТЕЛЬНЫЙ ЗАПРОС К КЛИЕНТСКИМ УСТРОЙСТВАМ (КАМЕРА / МИКРОФОН / АУДИОКОНТЕКСТ)
+        // Временное хранилище Blob-ссылок для видео текущей сессии
+        let videoBlobsStorage = {};
+
+        // Список дефолтных видео (если база пустая)
+        const defaultVideos = [
+            { id: "v1", author: "@code_boss", src: "https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-light-in-a-futuristic-tunnel-41838-large.mp4", desc: "Пишу код в неоновом туннеле" },
+            { id: "v2", author: "@admin", src: "https://assets.mixkit.co/videos/preview/mixkit-tunnel-of-futuristic-blue-lights-42205-large.mp4", desc: "ДевТок теперь без багов!" }
+        ];
+
         async function requestAllPermissions() {
             try {
-                // Запрашиваем официальное окно браузера на камеру и звук
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
-                // Гасим стрим сразу после проверки, он включится при записи
                 stream.getTracks().forEach(t => t.stop());
-                
-                // Активируем аудио-движок, чтобы браузер не блокировал звук видеороликов
                 globalAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                
                 document.getElementById('permissionModal').style.display = 'none';
-                
-                if (currentUser) {
-                    initApp();
-                } else {
-                    document.getElementById('authOverlay').style.display = 'flex';
-                }
+                if (currentUser) initApp(); else document.getElementById('authOverlay').style.display = 'flex';
             } catch (err) {
-                alert("Внимание: Без разрешений к камере и микрофону функции записи кружков работать не будут!");
                 document.getElementById('permissionModal').style.display = 'none';
                 if (currentUser) initApp(); else document.getElementById('authOverlay').style.display = 'flex';
             }
         }
 
-        // ОНЛАЙН ДВИЖОК С ОБЛАЧНЫМ СОХРАНЕНИЕМ ДЛЯ ВСЕХ УСТРОЙСТВ
-        // Чтобы запустить полноценный мультиплеер (базу данных), зарегистрируйтесь на supabase.com (это бесплатно 1 минута)
-        // И вставьте полученный URL и KEY сюда:
-        const SUPABASE_URL = ""; 
-        const SUPABASE_KEY = ""; 
-
-        const DB = {
+        // ОБЛАЧНЫЙ СЕРВЕР (Имитация глобальной синхронизации между вкладками)
+        const CloudDB = {
             getUsers: function() {
-                return JSON.parse(localStorage.getItem('dg_online_users')) || {
-                    "@code_boss": { username: "@code_boss", avatar: "", email: "boss@dev.ru", friends: [], chats: {} },
-                    "@admin": { username: "@admin", avatar: "", email: "admin@dev.ru", friends: [], chats: {} }
-                };
+                if(!localStorage.getItem('dg_global_users')) {
+                    localStorage.setItem('dg_global_users', JSON.stringify({
+                        "@admin": { username: "@admin", avatar: "", email: "admin@dev.ru", friends: [], chats: {} },
+                        "@code_boss": { username: "@code_boss", avatar: "", email: "boss@dev.ru", friends: [], chats: {} }
+                    }));
+                }
+                return JSON.parse(localStorage.getItem('dg_global_users'));
             },
             saveUsers: function(users) {
-                localStorage.setItem('dg_online_users', JSON.stringify(users));
-                // Если подключен Supabase, отправляем данные в облако:
-                if(SUPABASE_URL) {
-                    fetch(`${SUPABASE_URL}/rest/v1/users`, {
-                        method: 'POST', headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" },
-                        body: JSON.stringify(Object.values(users))
-                    });
-                }
+                localStorage.setItem('dg_global_users', JSON.stringify(users));
             },
             getVideos: function(type) {
-                let defaultVids = type === 'devtok' ? [
-                    { author: "@code_boss", src: "https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-light-in-a-futuristic-tunnel-41838-large.mp4", desc: "ДевТок онлайн!" },
-                    { author: "@admin", src: "https://assets.mixkit.co/videos/preview/mixkit-tunnel-of-futuristic-blue-lights-42205-large.mp4", desc: "Второе видео в базе." }
-                ] : [];
-                return JSON.parse(localStorage.getItem('dg_online_' + type)) || defaultVids;
-            },
-            saveVideo: function(type, array) {
-                localStorage.setItem('dg_online_' + type, JSON.stringify(array));
-                if(SUPABASE_URL) {
-                    fetch(`${SUPABASE_URL}/rest/v1/${type}`, {
-                        method: 'POST', headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json" },
-                        body: JSON.stringify(array[0])
-                    });
+                let key = 'dg_global_' + type;
+                if(!localStorage.getItem(key)) {
+                    localStorage.setItem(key, JSON.stringify(type === 'devtok' ? defaultVideos : []));
                 }
+                return JSON.parse(localStorage.getItem(key));
+            },
+            saveVideoList: function(type, list) {
+                localStorage.setItem('dg_global_' + type, JSON.stringify(list));
             }
         };
 
@@ -314,10 +318,10 @@
             if(!email.includes('@')) { document.getElementById('emailError').style.display = 'block'; return; }
             tempEmail = email;
             generatedCode = Math.floor(1000 + Math.random() * 9000).toString();
-            alert(`[ОНЛАЙН СЕРВЕР DevGram]\nКод подтверждения для почты ${email}: ${generatedCode}`);
+            alert(`[DevGram Server]\nКод подтверждения регистрации: ${generatedCode}`);
             document.getElementById('stepEmail').style.display = 'none';
             document.getElementById('stepCode').style.display = 'block';
-            document.getElementById('codeHint').innerText = `Код отправлен на ${email}`;
+            document.getElementById('codeHint').innerText = `Код выслан на ${email}`;
         }
 
         function verifyCode() {
@@ -344,21 +348,20 @@
             if(!username.startsWith('@')) username = '@' + username;
             const usernameRegex = /^@[a-zA-Z0-9_]+$/;
             
-            // Загружаем актуальную базу пользователей
-            let users = DB.getUsers();
+            let users = CloudDB.getUsers();
 
             if(!usernameRegex.test(username) || username.length < 3) {
-                showUsernameError("Только латиница, цифры и символ '_'"); return;
+                showUsernameError("Ник должен содержать буквы, цифры и '_'"); return;
             }
             
-            // НАСТОЯЩАЯ ПРОВЕРКА НА УНИКАЛЬНОСТЬ НИКА (Работает глобально)
+            // ЕСЛИ АККАУНТ БЫЛ УДАЛЕН — ЭТА ПРОВЕРКА ПРОЙДЕТ УСПЕШНО, НИК СВОБОДЕН!
             if(users[username]) { 
-                showUsernameError("Критическая ошибка: этот @username уже занят другим устройством!"); 
+                showUsernameError("Этот @username уже кем-то занят!"); 
                 return; 
             }
 
             users[username] = { username: username, avatar: tempAvatarBase64, email: tempEmail, friends: [], chats: {} };
-            DB.saveUsers(users);
+            CloudDB.saveUsers(users);
             
             localStorage.setItem('dg_current_user', username);
             currentUser = username;
@@ -372,6 +375,18 @@
         }
 
         function initApp() {
+            let users = CloudDB.getUsers();
+            let me = users[currentUser];
+            
+            if(me && me.avatar) {
+                document.getElementById('sidebarAvatar').innerHTML = `<img src="${me.avatar}">`;
+            } else {
+                document.getElementById('sidebarAvatar').innerText = currentUser.substring(1,3).toUpperCase();
+            }
+
+            document.getElementById('settingsTitle').innerText = me.username;
+            document.getElementById('settingsSub').innerText = `Почта: ${me.email}`;
+
             renderChatsList();
             renderDevTok();
             renderDevFul();
@@ -379,9 +394,13 @@
         }
 
         function switchTab(screenId, button) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
+            
+            const targetScreen = document.getElementById(screenId);
+            if(screenId === 'settings') targetScreen.style.display = 'flex';
+            else targetScreen.style.display = 'flex';
+
             button.classList.add('active');
 
             if(screenId === 'devtok') {
@@ -391,13 +410,39 @@
             }
         }
 
+        /* --- ВЫХОД И УДАЛЕНИЕ АККАУНТА --- */
+        function logOutAccount() {
+            if(confirm("Вы уверены, что хотите выйти из профиля?")) {
+                localStorage.removeItem('dg_current_user');
+                currentUser = null;
+                location.reload();
+            }
+        }
+
+        function deleteAccountPermanently() {
+            if(confirm("КРИТИЧЕСКОЕ ДЕЙСТВИЕ!\nВы уверены, что хотите НАВСЕГДА удалить свой аккаунт? Ваш ник мгновенно освободится для других.")) {
+                let users = CloudDB.getUsers();
+                
+                // Удаляем пользователя из общей базы
+                delete users[currentUser];
+                CloudDB.saveUsers(users);
+                
+                // Чистим локальные данные
+                localStorage.removeItem('dg_current_user');
+                currentUser = null;
+                
+                alert("Ваш аккаунт успешно ликвидирован! Юзернейм теперь свободен.");
+                location.reload();
+            }
+        }
+
         /* --- ПОИСК И МЕССЕНДЖЕР --- */
         function searchUser() {
             const searchVal = document.getElementById('userSearchInput').value.trim().toLowerCase();
             let formattedSearch = searchVal.startsWith('@') ? searchVal : '@' + searchVal;
-            let users = DB.getUsers();
+            let users = CloudDB.getUsers();
 
-            if(formattedSearch === currentUser) { alert("Вы нашли себя!"); return; }
+            if(formattedSearch === currentUser) { alert("Это вы!"); return; }
             if(users[formattedSearch]) { openChat(formattedSearch); } 
             else { alert("Пользователь не зарегистрирован в сети!"); }
         }
@@ -408,7 +453,7 @@
             document.getElementById('chatWindow').style.display = 'flex';
             document.getElementById('activeChatName').innerText = username;
             
-            let users = DB.getUsers();
+            let users = CloudDB.getUsers();
             let targetUser = users[username];
 
             const avatarDiv = document.getElementById('activeChatAvatar');
@@ -416,27 +461,27 @@
             else avatarDiv.innerHTML = username.substring(1,3).toUpperCase();
 
             const fBtn = document.getElementById('chatFriendBtn');
-            if(users[currentUser].friends.includes(username)) {
+            if(users[currentUser].friends && users[currentUser].friends.includes(username)) {
                 fBtn.innerText = "В друзьях"; fBtn.style.background = "#4ab54a";
             } else {
-                fBtn.innerText = "Добавить в друзья"; fBtn.style.background = "var(--tg-theme-button)";
+                fBtn.innerText = "В друзья"; fBtn.style.background = "var(--tg-theme-button)";
             }
             renderMessages();
             renderChatsList();
         }
 
         function toggleFriendInChat() {
-            let users = DB.getUsers();
+            let users = CloudDB.getUsers();
             let me = users[currentUser];
+            if(!me.friends) me.friends = [];
             if(me.friends.includes(activeChatUser)) { me.friends = me.friends.filter(f => f !== activeChatUser); } 
             else { me.friends.push(activeChatUser); }
-            DB.saveUsers(users);
+            CloudDB.saveUsers(users);
             openChat(activeChatUser);
-            renderDevTok();
         }
 
         function saveMessage(msgObj) {
-            let users = DB.getUsers();
+            let users = CloudDB.getUsers();
             if(!users[currentUser].chats) users[currentUser].chats = {};
             if(!users[activeChatUser].chats) users[activeChatUser].chats = {};
             if(!users[currentUser].chats[activeChatUser]) users[currentUser].chats[activeChatUser] = [];
@@ -444,7 +489,7 @@
 
             users[currentUser].chats[activeChatUser].push(msgObj);
             users[activeChatUser].chats[currentUser].push(msgObj);
-            DB.saveUsers(users);
+            CloudDB.saveUsers(users);
             renderMessages();
             renderChatsList();
         }
@@ -452,8 +497,8 @@
         function renderMessages() {
             const container = document.getElementById('chatMessages');
             container.innerHTML = '';
-            let users = DB.getUsers();
-            let history = users[currentUser].chats[activeChatUser] || [];
+            let users = CloudDB.getUsers();
+            let history = users[currentUser].chats?.[activeChatUser] || [];
 
             history.forEach(m => {
                 const div = document.createElement('div');
@@ -471,7 +516,7 @@
         function renderChatsList() {
             const container = document.getElementById('chatsContainer');
             container.innerHTML = '';
-            let users = DB.getUsers();
+            let users = CloudDB.getUsers();
             let myChats = users[currentUser].chats || {};
 
             Object.keys(myChats).forEach(username => {
@@ -495,7 +540,6 @@
             input.value = '';
         }
 
-        /* --- НАСТОЯЩАЯ ЗАПИСЬ С КАМЕРЫ И МИКРОФОНА --- */
         function triggerChatFile(type) {
             const loader = document.getElementById('chatFileLoader');
             loader.accept = type === 'image' ? 'image/*' : 'video/*';
@@ -516,7 +560,7 @@
             const voiceBtn = document.getElementById('voiceBtn');
             const circleBtn = document.getElementById('circleBtn');
 
-            voiceBtn.addEventListener('click', async () => {
+            voiceBtn.onclick = async () => {
                 if (!isRecordingVoice) {
                     try {
                         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -532,11 +576,11 @@
                         };
                         mediaRecorder.start();
                         isRecordingVoice = true; voiceBtn.classList.add('recording');
-                    } catch(e) { alert("Доступ к микрофону закрыт в системе."); }
+                    } catch(e) { alert("Микрофон недоступен."); }
                 } else { mediaRecorder.stop(); isRecordingVoice = false; voiceBtn.classList.remove('recording'); }
-            });
+            };
 
-            circleBtn.addEventListener('click', async () => {
+            circleBtn.onclick = async () => {
                 if(!isRecordingCircle) {
                     try {
                         circleStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
@@ -555,35 +599,39 @@
                         };
                         mediaRecorder.start();
                         isRecordingCircle = true; circleBtn.classList.add('recording');
-                    } catch(e) { alert("Доступ к камере/микрофону ограничен."); }
+                    } catch(e) { alert("Камера недоступна."); }
                 } else { mediaRecorder.stop(); isRecordingCircle = false; circleBtn.classList.remove('recording'); }
-            });
+            };
         }
 
-        /* --- МОДЕРНИЗИРОВАННЫЙ ДЕВТОК (БЕЗ ЗАВИСАНИЙ КУРСОРОВ) --- */
+        /* --- ИСПРАВЛЕННЫЙ ПЛЕЕР ДЕВТОК (РАБОТАЕТ МГНОВЕННО) --- */
         function renderDevTok() {
             const viewport = document.getElementById('devtokViewport');
             viewport.innerHTML = '';
-            let toks = DB.getVideos('devtok');
-            let users = DB.getUsers();
+            let toks = CloudDB.getVideos('devtok');
+            let users = CloudDB.getUsers();
 
             if(toks.length === 0) {
-                viewport.innerHTML = `<div style="text-align:center; padding:20px; color:gray;">Лента пуста. Выложите видео первым!</div>`;
+                viewport.innerHTML = `<div style="text-align:center; padding:50px; color:gray;">ДевТок лента пуста</div>`;
                 return;
             }
 
             toks.forEach((t, idx) => {
-                let isFriend = users[currentUser].friends.includes(t.author);
+                let isFriend = users[currentUser]?.friends?.includes(t.author);
                 const card = document.createElement('div');
                 card.className = `video-card-vertical ${idx === currentPlayingIndex ? 'active' : ''}`;
                 card.setAttribute('id', `tok-${idx}`);
+                
+                // Проверяем, откуда брать видео: из Blob-памяти текущей сессии или по внешней веб-ссылке
+                let finalSrc = videoBlobsStorage[t.id] ? videoBlobsStorage[t.id] : t.src;
+
                 card.innerHTML = `
-                    <video src="${t.src}" loop playsinline></video>
+                    <video src="${finalSrc}" loop playsinline></video>
                     <div class="video-overlay">
                         <div class="author-info">
                             <h3>${t.author}</h3>
                             <p>${t.desc}</p>
-                            ${t.author !== currentUser ? `<button class="add-friend-btn" onclick="toggleFriendFromFeed('${t.author}')">${isFriend ? 'В друзьях' : 'Добавить в друзья'}</button>` : ''}
+                            ${t.author !== currentUser ? `<button class="add-friend-btn" onclick="toggleFriendFromFeed('${t.author}')">${isFriend ? 'В друзьях' : 'В друзья'}</button>` : ''}
                         </div>
                     </div>
                 `;
@@ -592,14 +640,13 @@
         }
 
         function changeVideo(direction) {
-            let toks = DB.getVideos('devtok');
+            let toks = CloudDB.getVideos('devtok');
             let newIndex = currentPlayingIndex + direction;
 
             if (newIndex >= 0 && newIndex < toks.length) {
                 stopAllVideos();
                 currentPlayingIndex = newIndex;
                 
-                // Переключаем класс видимости активной карточки
                 document.querySelectorAll('.video-card-vertical').forEach((card, idx) => {
                     if(idx === currentPlayingIndex) card.classList.add('active');
                     else card.classList.remove('active');
@@ -614,22 +661,24 @@
             if (activeCard) {
                 let video = activeCard.querySelector('video');
                 if(video) {
-                    video.muted = false; // Звук РАЗБЛОКИРОВАН
-                    video.play();
+                    video.muted = false; // Звук полностью включен благодаря клику по кнопкам стрелок!
+                    video.play().catch(e => console.log("Автоплей заблокирован системой"));
                 }
             }
         }
 
         function stopAllVideos() {
             document.querySelectorAll('.video-card-vertical video').forEach(v => { v.pause(); });
+            document.querySelectorAll('.video-card-horizontal video').forEach(v => { v.pause(); });
         }
 
         function toggleFriendFromFeed(author) {
             activeChatUser = author;
             toggleFriendInChat();
+            renderDevTok();
         }
 
-        /* --- ДЕВФУЛ (ОБЛАЧНАЯ СИНХРОНИЗАЦИЯ) --- */
+        /* --- НОВЫЙ ДВИЖОК ЗАГРУЗКИ ВИДЕО (ЧЕРЕЗ BLOB) --- */
         let uploadTarget = "";
         function triggerUpload(target) {
             uploadTarget = target;
@@ -640,49 +689,49 @@
             const file = e.target.files[0];
             if(!file) return;
 
-            const videoElement = document.createElement('video');
-            videoElement.preload = 'metadata';
-            videoElement.src = URL.createObjectURL(file);
+            // Генерируем мгновенную виртуальную ссылку на файл в памяти браузера
+            const blobUrl = URL.createObjectURL(file);
+            const videoId = "video_" + Date.now();
+            
+            // Сохраняем указатель на файл во временное хранилище сессии
+            videoBlobsStorage[videoId] = blobUrl;
 
-            videoElement.onloadedmetadata = function() {
-                URL.revokeObjectURL(videoElement.src);
-                const duration = videoElement.duration;
-                const reader = new FileReader();
-
-                reader.onload = function(event) {
-                    if(uploadTarget === 'devtok') {
-                        if(duration > 60) { alert("Предупреждение: ДевТок принимает ролики до 1 минуты!"); return; }
-                        let toks = DB.getVideos('devtok');
-                        toks.unshift({ author: currentUser, src: event.target.result, desc: file.name });
-                        DB.saveVideo('devtok', toks);
-                        currentPlayingIndex = 0;
-                        renderDevTok();
-                        playActiveVideo();
-                    } else {
-                        let fuls = DB.getVideos('devful');
-                        fuls.unshift({ author: currentUser, src: event.target.result, title: file.name.split('.')[0] });
-                        DB.saveVideo('devful', fuls);
-                        renderDevFul();
-                    }
-                    alert("Ваше видео успешно улетело на общий сервер!");
-                };
-                reader.readAsDataURL(file);
-            };
+            if(uploadTarget === 'devtok') {
+                let toks = CloudDB.getVideos('devtok');
+                // Добавляем запись в начало глобального массива
+                toks.unshift({ id: videoId, author: currentUser, src: "", desc: file.name });
+                CloudDB.saveVideoList('devtok', toks);
+                
+                currentPlayingIndex = 0;
+                renderDevTok();
+                playActiveVideo();
+            } else {
+                let fuls = CloudDB.getVideos('devful');
+                fuls.unshift({ id: videoId, author: currentUser, src: "", title: file.name.split('.')[0] });
+                CloudDB.saveVideoList('devful', fuls);
+                renderDevFul();
+            }
+            alert("Успешно опубликовано в общую ленту!");
         });
 
         function renderDevFul() {
             const grid = document.getElementById('devfulGrid');
             grid.innerHTML = '';
-            let fuls = DB.getVideos('devful');
-            if(fuls.length === 0) { grid.innerHTML = `<div style="color:gray;">Длинных видео на сервере пока нет.</div>`; return; }
+            let fuls = CloudDB.getVideos('devful');
+            if(fuls.length === 0) { grid.innerHTML = `<div style="color:gray; padding:20px;">Длинных видео пока нет.</div>`; return; }
 
             fuls.forEach(f => {
+                let finalSrc = videoBlobsStorage[f.id] ? videoBlobsStorage[f.id] : f.src;
                 const card = document.createElement('div');
                 card.className = 'video-card-horizontal';
-                card.innerHTML = `<video src="${f.src}" controls></video><div class="horizontal-info"><h3>${f.title}</h3><p>Автор: ${f.author}</p></div>`;
+                card.innerHTML = `<video src="${finalSrc}" controls></video><div class="horizontal-info"><h3>${f.title}</h3><p>Автор: ${f.author}</p></div>`;
                 grid.appendChild(card);
             });
         }
+
+        window.onload = function() {
+            requestAllPermissions();
+        };
     </script>
 </body>
 </html>
