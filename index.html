@@ -1044,16 +1044,27 @@
         }
 
         function deleteAccountPermanently() {
-            if (confirm('⚠️ ВЫ УВЕРЕНЫ?\n\nУдаление аккаунта необратимо!\nВаш юзернейм больше никогда не сможет быть восстановлен.')) {
-                if (confirm('Это последнее предупреждение. Удалить аккаунт @' + currentUser + '?')) {
+            if (confirm('⚠️ ВЫ УВЕРЕНЫ?\n\nУдаление аккаунта необратимо!\nВаш юзернейм будет полностью освобожден.')) {
+                if (confirm('Это последнее предупреждение. Удалить аккаунт ' + currentUser + '?')) {
                     let users = CloudDB.getUsers();
-                    users[currentUser].deleted = true;
-                    CloudDB.saveUsers(users);
 
+                    // Удаляем аккаунт полностью и убираем ссылки на него из других пользователей
+                    delete users[currentUser];
+                    for (let username in users) {
+                        const user = users[username];
+                        if (user.friends) {
+                            user.friends = user.friends.filter(f => f !== currentUser);
+                        }
+                        if (user.chats && user.chats[currentUser]) {
+                            delete user.chats[currentUser];
+                        }
+                    }
+
+                    CloudDB.saveUsers(users);
                     localStorage.removeItem('dg_current_user');
                     currentUser = null;
 
-                    alert('❌ Ваш аккаунт удален.');
+                    alert('❌ Ваш аккаунт удален. Юзернейм теперь свободен.');
                     location.reload();
                 }
             }
