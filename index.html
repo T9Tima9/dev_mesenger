@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevGram Pro</title>
+    <style>
+        :root {
+            --tg-theme-bg: #0e1621;
+            --tg-theme-sidebar: #17212b;
+            --tg-theme-active: #2b5278;
+            --tg-theme-text: #f5f5f5;
+            --tg-theme-hint: #7f91a4;
+            --tg-theme-button: #2481cc;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        body { background-color: var(--tg-theme-bg); color: var(--tg-theme-text); display: flex; height: 100vh; overflow: hidden; }
+
+        /* Окно авторизации */
+        #authOverlay { position: fixed; top:0; left:0; width:100vw; height:100vh; background: var(--tg-theme-bg); z-index: 9999; display: flex; justify-content: center; align-items: center; }
+        .auth-card { background: var(--tg-theme-sidebar); padding: 30px; border-radius: 12px; width: 350px; display: flex; flex-direction: column; gap: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        .auth-card h2 { text-align: center; margin-bottom: 10px; }
+        .auth-card input { padding: 12px; background: var(--tg-theme-bg); border: 1px solid #223242; border-radius: 6px; color: white; outline: none; }
+        .auth-card button { padding: 12px; background: var(--tg-theme-button); border: none; border-radius: 6px; color: white; cursor: pointer; font-weight: bold; }
+        .auth-card button:hover { opacity: 0.9; }
+        .error-msg { color: #e53935; font-size: 13px; text-align: center; display: none; }
+        
+        /* Стили аватара в реге */
+        .avatar-picker { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .avatar-preview { width: 80px; height: 80px; border-radius: 50%; background: #517da2; display: flex; align-items: center; justify-content: center; font-size: 30px; overflow: hidden; }
+        .avatar-preview img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Боковая панель */
+        .sidebar { width: 80px; background-color: var(--tg-theme-sidebar); display: flex; flex-direction: column; align-items: center; padding: 20px 0; border-right: 1px solid #101921; gap: 25px; }
+        .logo-dev { font-size: 28px; font-weight: bold; color: var(--tg-theme-button); background: #2481cc22; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 15px; }
+        .nav-btn { background: none; border: none; color: var(--tg-theme-hint); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 11px; width: 100%; padding: 10px 0; }
+        .nav-btn.active { color: var(--tg-theme-button); background: #2481cc11; border-left: 3px solid var(--tg-theme-button); }
+        .nav-btn svg { width: 26px; height: 26px; fill: currentColor; }
+
+        /* Главная область */
+        .main-content { flex: 1; display: flex; position: relative; }
+        .screen { display: none; width: 100%; height: 100%; }
+        .screen.active { display: flex; }
+
+        /* Мессенджер */
+        .chats-list { width: 320px; background-color: var(--tg-theme-sidebar); border-right: 1px solid #101921; display: flex; flex-direction: column; }
+        .search-bar { padding: 15px; border-bottom: 1px solid #101921; display: flex; gap: 5px; }
+        .search-bar input { flex:1; padding: 8px; background: var(--tg-theme-bg); border: none; border-radius: 6px; color: white; }
+        .search-bar button { padding: 0 10px; background: var(--tg-theme-button); border: none; color: white; border-radius: 6px; cursor: pointer; }
+        .chats-container { flex: 1; overflow-y: auto; }
+        .chat-item { padding: 15px; display: flex; align-items: center; gap: 12px; cursor: pointer; border-bottom: 1px solid #101921; }
+        .chat-item:hover, .chat-item.active { background-color: var(--tg-theme-active); }
+        .avatar { width: 45px; height: 45px; border-radius: 50%; background: #517da2; overflow: hidden; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .chat-window { flex: 1; display: flex; flex-direction: column; background: #0e1621; }
+        .chat-header { padding: 15px 20px; background: var(--tg-theme-sidebar); display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #101921; }
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        
+        .msg { max-width: 60%; padding: 10px 14px; border-radius: 12px; font-size: 14px; position: relative; }
+        .msg.in { background: var(--tg-theme-sidebar); align-self: flex-start; }
+        .msg.out { background: #2b5278; align-self: flex-end; }
+        .msg video, .msg img, .msg audio { max-width: 240px; display: block; border-radius: 8px; margin-top: 5px; }
+        .msg .circle-video { width: 160px; height: 160px; border-radius: 50%; object-fit: cover; }
+
+        /* Панель ввода */
+        .chat-input-area { padding: 15px; background: var(--tg-theme-sidebar); display: flex; align-items: center; gap: 10px; position: relative; }
+        .chat-input-area input { flex: 1; padding: 10px 15px; background: var(--tg-theme-bg); border: none; border-radius: 8px; color: white; outline: none; }
+        .media-actions { display: flex; gap: 8px; }
+        .icon-btn { background: none; border: none; font-size: 20px; cursor: pointer; opacity: 0.7; }
+        .icon-btn:hover { opacity: 1; }
+        .icon-btn.recording { color: #e53935; animation: blink 1s infinite; }
+        .send-btn-9 { background: var(--tg-theme-button); border: none; width: 38px; height: 38px; border-radius: 50%; color: white; font-size: 18px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+        /* Камера фид для кружков */
+        #cameraPreviewContainer { display: none; position: absolute; bottom: 70px; left: 20px; width: 150px; height: 150px; border-radius: 50%; overflow: hidden; border: 3px solid var(--tg-theme-button); }
+        #cameraPreviewContainer video { width: 100%; height: 100%; object-fit: cover; }
+
+        /* ДевТок */
+        .devtok-container { flex: 1; display: flex; justify-content: center; align-items: center; background: #000; position: relative; }
+        .video-card-vertical { width: 360px; height: 640px; background: #111; border-radius: 16px; position: relative; overflow: hidden; }
+        .video-card-vertical video { width: 100%; height: 100%; object-fit: cover; }
+        .video-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px; background: linear-gradient(transparent, rgba(0,0,0,0.9)); display: flex; justify-content: space-between; align-items: flex-end; }
+        .add-friend-btn { background: var(--tg-theme-button); border: none; color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer; margin-top: 5px; font-weight: bold; }
+        .upload-floating-btn { position: absolute; top: 20px; right: 20px; background: var(--tg-theme-button); color: white; border: none; padding: 12px 24px; border-radius: 20px; cursor: pointer; font-weight: bold; z-index: 10; }
+
+        /* ДевФул */
+        .devful-container { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 25px; }
+        .devful-header { display: flex; justify-content: space-between; align-items: center; }
+        .devful-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+        .video-card-horizontal { background: var(--tg-theme-sidebar); border-radius: 12px; overflow: hidden; }
+        .video-card-horizontal video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; }
+        .horizontal-info { padding: 15px; }
+
+        .hidden-input { display: none; }
+        @keyframes blink { 50% { opacity: 0.4; } }
+    </style>
+</head>
+<body>
+
+    <!-- ЭКРАН РЕГИСТРАЦИИ И ВХОДА -->
+    <div id="authOverlay">
+        <!-- Шаг 1: Почта -->
+        <div class="auth-card" id="stepEmail">
+            <h2>Регистрация</h2>
+            <p style="color:var(--tg-theme-hint); text-align:center; font-size:14px;">Введите почту, мы отправим проверочный код</p>
+            <input type="email" id="authEmail" placeholder="name@example.com" required>
+            <button onclick="sendCodeMock()">Получить код</button>
+            <div class="error-msg" id="emailError">Введите корректную почту</div>
+        </div>
+
+        <!-- Шаг 2: Код -->
+        <div class="auth-card" id="stepCode" style="display:none;">
+            <h2>Ввод кода</h2>
+            <p style="color:var(--tg-theme-hint); text-align:center; font-size:14px;" id="codeHint"></p>
+            <input type="text" id="authCode" placeholder="Код из письма" maxlength="4">
+            <button onclick="verifyCode()">Подтвердить код</button>
+            <div class="error-msg" id="codeError">Неверный код!</div>
+        </div>
+
+        <!-- Шаг 3: Юзернейм и Аватар -->
+        <div class="auth-card" id="stepProfile" style="display:none;">
+            <h2>Ваш профиль</h2>
+            <div class="avatar-picker">
+                <div class="avatar-preview" id="avatarPreview">😎</div>
+                <button onclick="document.getElementById('avatarFile').click()" style="padding:5px 10px; font-size:12px; background:#313e4b;">Выбрать фото</button>
+                <input type="file" id="avatarFile" class="hidden-input" accept="image/*">
+            </div>
+            <input type="text" id="authUsername" placeholder="@username">
+            <div class="error-msg" id="usernameError">Такой юзернейм уже занят или некорректен!</div>
+            <button onclick="completeRegistration()">Войти в DevGram</button>
+        </div>
+    </div>
+
+    <!-- ОСНОВНОЙ ИНТЕРФЕЙС ПРИЛОЖЕНИЯ -->
+    <div class="sidebar">
+        <div class="logo-dev">9</div>
+        <button class="nav-btn active" onclick="switchTab('messenger', this)">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.54.36 2.98 1 4.28L2 22l5.72-1c1.3.64 2.74 1 4.28 1 5.52 0 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/></svg>
+            Чаты (9)
+        </button>
+        <button class="nav-btn" onclick="switchTab('devtok', this)">
+            <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8 12.5v-9l6 4.5-6 4.5z"/></svg>
+            ДевТок
+        </button>
+        <button class="nav-btn" onclick="switchTab('devful', this)">
+            <svg viewBox="0 0 24 24"><path d="M21 3H3c-1.11 0-2 .89-2 2v14c0 1.1.89 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 12V9l5 3-5 3z"/></svg>
+            ДевФул
+        </button>
+    </div>
+
+    <div class="main-content">
+        <!-- МЕССЕНДЖЕР -->
+        <div id="messenger" class="screen active">
+            <div class="chats-list">
+                <div class="search-bar">
+                    <input type="text" id="userSearchInput" placeholder="Поиск по @username...">
+                    <button onclick="searchUser()">Найти</button>
+                </div>
+                <div class="chats-container" id="chatsContainer">
+                    <!-- Сюда динамически загружаются чаты -->
+                </div>
+            </div>
+            
+            <div class="chat-window" id="chatWindow" style="display:none;">
+                <div class="chat-header">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <div class="avatar" id="activeChatAvatar"></div>
+                        <h4 id="activeChatName">@username</h4>
+                    </div>
+                    <button class="add-friend-btn" id="chatFriendBtn" onclick="toggleFriendInChat()">Добавить в друзья</button>
+                </div>
+                <div class="chat-messages" id="chatMessages"></div>
+                
+                <div class="chat-input-area">
+                    <div id="cameraPreviewContainer"><video id="cameraPreview" autoplay muted></video></div>
+                    <div class="media-actions">
+                        <button class="icon-btn" title="Фото" onclick="triggerChatFile('image')">📷</button>
+                        <button class="icon-btn" title="Видео" onclick="triggerChatFile('video')">🎥</button>
+                        <button class="icon-btn" id="voiceBtn" title="Удерживать для Голосового">🎙️</button>
+                        <button class="icon-btn" id="circleBtn" title="Нажать для Кружка">⭕</button>
+                    </div>
+                    <input type="text" id="messageInput" placeholder="Напишите сообщение...">
+                    <button class="send-btn-9" onclick="sendTextMessage()">9</button>
+                </div>
+            </div>
+            <div style="flex:1; display:flex; justify-content:center; align-items:center; color:var(--tg-theme-hint);" id="noChatPlaceholder">
+                Выберите чат или найдите пользователя через поиск
+            </div>
+        </div>
+
+        <!-- ДЕВТОК -->
+        <div id="devtok" class="screen">
+            <button class="upload-floating-btn" onclick="triggerUpload('devtok')">+ Создать ДевТок</button>
+            <div class="devtok-container" id="devtokContainer">
+                <!-- Сюда грузятся видео -->
+            </div>
+        </div>
+
+        <!-- ДЕВФУЛ -->
+        <div id="devful" class="screen">
+            <div class="devful-container">
+                <div class="devful-header">
+                    <h2>ДевФул — Длинные видео</h2>
+                    <button class="upload-floating-btn" style="position:static;" onclick="triggerUpload('devful')">+ Добавить видео</button>
+                </div>
+                <div class="devful-grid" id="devfulGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="chatFileLoader" class="hidden-input">
+    <input type="file" id="contentVideoLoader" class="hidden-input" accept="video/*">
+
+    <script>
+        // Инициализация базы данных в LocalStorage
+        if(!localStorage.getItem('dg_users')) {
+            localStorage.setItem('dg_users', JSON.stringify({
+                "@admin": { username: "@admin", avatar: "", email: "admin@dev.ru", friends: [], chats: {} },
+                "@code_boss": { username: "@code_boss", avatar: "", email: "boss@dev.ru", friends: [], chats: {} }
+            }));
+        }
+        if(!localStorage.getItem('dg_devtok')) localStorage.setItem('dg_devtok', JSON.stringify([]));
+        if(!localStorage.getItem('dg_devful')) localStorage.setItem('dg_devful', JSON.stringify([]));
+
+        let currentUser = localStorage.getItem('dg_current_user') || null;
+        let generatedCode = null;
+        let tempEmail = "";
+        let tempAvatarBase64 = "";
+        let activeChatUser = null;
+
+        // Потоки записи медиа
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let videoChunks = [];
+        let isRecordingVoice = false;
+        let isRecordingCircle = false;
+        let circleStream = null;
+
+        window.onload = function() {
+            if (currentUser) {
+                document.getElementById('authOverlay').style.display = 'none';
+                initApp();
+            }
+        };
+
+        /* --- СИСТЕМА РЕГИСТРАЦИИ --- */
+        function sendCodeMock() {
+            const email = document.getElementById('authEmail').value;
+            if(!email.includes('@')) {
+                document.getElementById('emailError').style.display = 'block';
+                return;
+            }
+            tempEmail = email;
+            generatedCode = Math.floor(1000 + Math.random() * 9000).toString();
+            
+            // Имитируем отправку на почту через alert
+            alert(`[Имитация письма на ${email}]\nВаш проверочный код доступа: ${generatedCode}`);
+            
+            document.getElementById('stepEmail').style.display = 'none';
+            document.getElementById('stepCode').style.display = 'block';
+            document.getElementById('codeHint').innerText = `Код отправлен на ${email}`;
+        }
+
+        function verifyCode() {
+            const code = document.getElementById('authCode').value;
+            if(code === generatedCode) {
+                document.getElementById('stepCode').style.display = 'none';
+                document.getElementById('stepProfile').style.display = 'block';
+            } else {
+                document.getElementById('codeError').style.display = 'block';
+            }
+        }
+
+        // Обработка загрузки аватарки при регистрации
+        document.getElementById('avatarFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    tempAvatarBase64 = event.target.result;
+                    document.getElementById('avatarPreview').innerHTML = `<img src="${tempAvatarBase64}">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function completeRegistration() {
+            let username = document.getElementById('authUsername').value.trim().toLowerCase();
+            if(!username.startsWith('@')) username = '@' + username;
+
+            // Валидация юзернейма регуляркой (без пробелов, буквы, цифры, нижнее подчеркивание)
+            const usernameRegex = /^@[a-zA-Z0-9_]+$/;
+            
+            let users = JSON.parse(localStorage.getItem('dg_users'));
+
+            if(!usernameRegex.test(username) || username.length < 3) {
+                showUsernameError("Неверный формат! Только английские буквы, цифры и '_'");
+                return;
+            }
+
+            if(users[username]) {
+                showUsernameError("Этот @username уже занят!");
+                return;
+            }
+
+            // Создаем нового пользователя
+            users[username] = {
+                username: username,
+                avatar: tempAvatarBase64,
+                email: tempEmail,
+                friends: [],
+                chats: {}
+            };
+
+            localStorage.setItem('dg_users', JSON.stringify(users));
+            localStorage.setItem('dg_current_user', username);
+            currentUser = username;
+
+            document.getElementById('authOverlay').style.display = 'none';
+            initApp();
+        }
+
+        function showUsernameError(text) {
+            const err = document.getElementById('usernameError');
+            err.innerText = text;
+            err.style.display = 'block';
+        }
+
+        /* --- СТАРТ ПРИЛОЖЕНИЯ И НАВИГАЦИЯ --- */
+        function initApp() {
+            renderChatsList();
+            renderDevTok();
+            renderDevFul();
+            setupMediaHandlers();
+        }
+
+        function switchTab(screenId, button) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            button.classList.add('active');
+
+            const devtokVid = document.querySelector('.video-card-vertical video');
+            if(devtokVid) {
+                if(screenId === 'devtok') devtokVid.play();
+                else devtokVid.pause();
+            }
+        }
+
+        /* --- ПОИСК И ЧАТЫ --- */
+        function searchUser() {
+            const searchVal = document.getElementById('userSearchInput').value.trim().toLowerCase();
+            let formattedSearch = searchVal.startsWith('@') ? searchVal : '@' + searchVal;
+
+            let users = JSON.parse(localStorage.getItem('dg_users'));
+
+            if(formattedSearch === currentUser) {
+                alert("Вы не можете искать самого себя");
+                return;
+            }
+
+            if(users[formattedSearch]) {
+                openChat(formattedSearch);
+            } else {
+                alert("Пользователь с таким @username не найден!");
+            }
+        }
+
+        function openChat(username) {
+            activeChatUser = username;
+            document.getElementById('noChatPlaceholder').style.display = 'none';
+            document.getElementById('chatWindow').style.display = 'flex';
+            document.getElementById('activeChatName').innerText = username;
+            
+            let users = JSON.parse(localStorage.getItem('dg_users'));
+            let targetUser = users[username];
+
+            const avatarDiv = document.getElementById('activeChatAvatar');
+            if(targetUser.avatar) avatarDiv.innerHTML = `<img src="${targetUser.avatar}">`;
+            else avatarDiv.innerHTML = username.substring(1,3).toUpperCase();
+
+            // Кнопка друзей
+            let me = users[currentUser];
+            const fBtn = document.getElementById('chatFriendBtn');
+            if(me.friends.includes(username)) {
+                fBtn.innerText = "В друзьях";
+                fBtn.style.background = "#4ab54a";
+            } else {
+                fBtn.innerText = "Добавить в друзья";
+                fBtn.style.background = "var(--tg-theme-button)";
+            }
+
+            renderMessages();
+            renderChatsList();
+        }
+
+        function toggleFriendInChat() {
+            let users = JSON.parse(localStorage.getItem('dg_users'));
+            let me = users[currentUser];
+
+            if(me.friends.includes(activeChatUser)) {
+                me.friends = me.friends.filter(f => f !== activeChatUser);
+            } else {
+                me.friends.push(activeChatUser);
+            }
+
+            localStorage.setItem('dg_users', JSON.stringify(users));
+            openChat(activeChatUser);
+            renderDevTok(); // Обновляем кнопку в ленте если там этот юзер
+        }
+
+        function saveMessage(msgObj) {
+            let users = JSON.parse(localStorage.getItem('dg_users'));
+            
+            if(!users[currentUser].chats) users[currentUser].chats = {};
+            if(!users[activeChatUser].chats) users[activeChatUser].chats = {};
+
+            if(!users[currentUser].chats[activeChatUser]) users[currentUser].chats[activeChatUser] = [];
+            if(!users[activeChatUser].chats[currentUser]) users[activeChatUser].chats[currentUser] = [];
+
+            users[currentUser].chats[activeChatUser].push(msgObj);
+            users[activeChatUser].chats[currentUser].push(msgObj);
+
+            localStorage.setItem('dg_users', JSON.stringify(users));
+            renderMessages();
+            renderChatsList();
+        }
+
+        function renderMessages() {
+            const container = document.getElementById('chatMessages');
+            container.innerHTML = '';
+            let users = JSON.parse(localStorage.getItem('dg_users'));
+            let history = (users[currentUser].chats && users[currentUser].chats[activeChatUser]) ? users[currentUser].chats[activeChatUser] : [];
+
+            history.forEach(m => {
+                const div = document.createElement('div');
+                div.className = `msg ${m.sender === currentUser ? 'out' : 'in'}`;
+                
+                if(m.type === 'text') div.innerText = m.content;
+                if(m.type === 'image') div.innerHTML = `<img src="${m.content}">`;
+                if(m.type === 'video') div.innerHTML = `<video src="${m.content}" controls></video>`;
+                if(m.type === 'voice') div.innerHTML = `<audio src="${m.content}" controls></audio>`;
+                if(m.type === 'circle') div.innerHTML = `<video class="circle-video" src="${m.content}" autoplay loop muted controls></video>`;
+
+                container.appendChild(div);
+            });
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function renderChatsList() {
+            const container = document.getElementById('chatsContainer');
+            container.innerHTML = '';
+            let users = JSON.parse(localStorage.getItem('dg_users'));
+            let myChats = users[currentUser].chats || {};
+
+            Object.keys(myChats).forEach(username => {
+                const item = document.createElement('div');
+                item.className = `chat-item ${activeChatUser === username ? 'active' : ''}`;
+                item.onclick = () => openChat(username);
+
+                let uData = users[username] || { avatar: "" };
+                let lastMsg = myChats[username][myChats[username].length - 1];
+                let previewText = lastMsg.type === 'text' ? lastMsg.content : `[Медиафайл]`;
+
+                item.innerHTML = `
+                    <div class="avatar">${uData.avatar ? `<img src="${uData.avatar}">` : username.substring(1,3).toUpperCase()}</div>
+                    <div class="chat-info">
+                        <h4>${username}</h4>
+                        <p>${previewText}</p>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function sendTextMessage() {
+            const input = document.getElementById('messageInput');
+            if(!input.value.trim() || !activeChatUser) return;
+            
+            saveMessage({
+                sender: currentUser,
+                type: 'text',
+                content: input.value
+            });
+            input.value = '';
+        }
+
+        /* --- ЗАПИСЬ НАСТОЯЩЕГО ГОЛОСА И КРУЖКОВ (МЕДИА) --- */
+        function triggerChatFile(type) {
+            const loader = document.getElementById('chatFileLoader');
+            loader.accept = type === 'image' ? 'image/*' : 'video/*';
+            loader.onchange = function(e) {
+                const file = e.target.files[0];
+                if(file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        saveMessage({
+                            sender: currentUser,
+                            type: type,
+                            content: event.target.result
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            loader.click();
+        }
+
+        function setupMediaHandlers() {
+            const voiceBtn = document.getElementById('voiceBtn');
+            const circleBtn = document.getElementById('circleBtn');
+
+            // Настоящее голосовое через удержание / клик
+            voiceBtn.addEventListener('click', async () => {
+                if (!isRecordingVoice) {
+                    try {
+                        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                        mediaRecorder = new MediaRecorder(stream);
+                        audioChunks = [];
+                        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                        mediaRecorder.onstop = () => {
+                            const blob = new Blob(audioChunks, { type: 'audio/ogg; codecs=opus' });
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                                saveMessage({ sender: currentUser, type: 'voice', content: reader.result });
+                            };
+                            reader.readAsDataURL(blob);
+                            stream.getTracks().forEach(track => track.stop());
+                        };
+                        mediaRecorder.start();
+                        isRecordingVoice = true;
+                        voiceBtn.classList.add('recording');
+                    } catch(e) { alert("Микрофон недоступен или заблокирован."); }
+                } else {
+                    mediaRecorder.stop();
+                    isRecordingVoice = false;
+                    voiceBtn.classList.remove('recording');
+                }
+            });
+
+            // Настоящие Кружки Видео
+            circleBtn.addEventListener('click', async () => {
+                if(!isRecordingCircle) {
+                    try {
+                        circleStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                        document.getElementById('cameraPreviewContainer').style.display = 'block';
+                        document.getElementById('cameraPreview').srcObject = circleStream;
+                        
+                        mediaRecorder = new MediaRecorder(circleStream);
+                        videoChunks = [];
+                        mediaRecorder.ondataavailable = e => videoChunks.push(e.data);
+                        mediaRecorder.onstop = () => {
+                            const blob = new Blob(videoChunks, { type: 'video/mp4' });
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                                saveMessage({ sender: currentUser, type: 'circle', content: reader.result });
+                            };
+                            reader.readAsDataURL(blob);
+                            circleStream.getTracks().forEach(track => track.stop());
+                            document.getElementById('cameraPreviewContainer').style.display = 'none';
+                        };
+                        
+                        mediaRecorder.start();
+                        isRecordingCircle = true;
+                        circleBtn.classList.add('recording');
+                    } catch(e) { alert("Камера/Микрофон недоступны."); }
+                } else {
+                    mediaRecorder.stop();
+                    isRecordingCircle = false;
+                    circleBtn.classList.remove('recording');
+                }
+            });
+        }
+
+        /* --- ЛЕНТЫ ДЕВТОК И ДЕВФУЛ --- */
+        let uploadTarget = "";
+        function triggerUpload(target) {
+            uploadTarget = target;
+            document.getElementById('contentVideoLoader').click();
+        }
+
+        document.getElementById('contentVideoLoader').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+
+            const videoElement = document.createElement('video');
+            videoElement.preload = 'metadata';
+            videoElement.src = URL.createObjectURL(file);
+
+            videoElement.onloadedmetadata = function() {
+                URL.revokeObjectURL(videoElement.src);
+                const duration = videoElement.duration;
+
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const videoBase64 = event.target.result;
+
+                    if(uploadTarget === 'devtok') {
+                        if(duration > 60) {
+                            alert("Ошибка! Видео в ДевТок должно быть строго до 1 минуты.");
+                            return;
+                        }
+                        let toks = JSON.parse(localStorage.getItem('dg_devtok'));
+                        toks.unshift({ author: currentUser, src: videoBase64, desc: file.name });
+                        localStorage.setItem('dg_devtok', JSON.stringify(toks));
+                        renderDevTok();
+                    } else {
+                        let fuls = JSON.parse(localStorage.getItem('dg_devful'));
+                        fuls.unshift({ author: currentUser, src: videoBase64, title: file.name.split('.')[0] });
+                        localStorage.setItem('dg_devful', JSON.stringify(fuls));
+                        renderDevFul();
+                    }
+                };
+                reader.readAsDataURL(file);
+            };
+        });
+
+        function renderDevTok() {
+            const container = document.getElementById('devtokContainer');
+            container.innerHTML = '';
+            let toks = JSON.parse(localStorage.getItem('dg_devtok'));
+            let users = JSON.parse(localStorage.getItem('dg_users'));
+
+            if(toks.length === 0) {
+                container.innerHTML = `<div style="color:gray;">Тут пока ничего нет. Будьте первыми!</div>`;
+                return;
+            }
+
+            // Показываем первое актуальное видео из ленты
+            let t = toks[0]; 
+            let isFriend = users[currentUser].friends.includes(t.author);
+
+            const card = document.createElement('div');
+            card.className = 'video-card-vertical';
+            card.innerHTML = `
+                <video src="${t.src}" loop autoplay muted controls></video>
+                <div class="video-overlay">
+                    <div class="author-info">
+                        <h3>${t.author}</h3>
+                        <p>${t.desc}</p>
+                        ${t.author !== currentUser ? `<button class="add-friend-btn" onclick="toggleFriendFromFeed('${t.author}')">${isFriend ? 'В друзьях' : 'Добавить в друзья'}</button>` : ''}
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+        }
+
+        function toggleFriendFromFeed(author) {
+            activeChatUser = author;
+            toggleFriendInChat();
+        }
+
+        function renderDevFul() {
+            const grid = document.getElementById('devfulGrid');
+            grid.innerHTML = '';
+            let fuls = JSON.parse(localStorage.getItem('dg_devful'));
+
+            if(fuls.length === 0) {
+                grid.innerHTML = `<div style="color:gray;">Нет загруженных длинных видео.</div>`;
+                return;
+            }
+
+            fuls.forEach(f => {
+                const card = document.createElement('div');
+                card.className = 'video-card-horizontal';
+                card.innerHTML = `
+                    <video src="${f.src}" controls></video>
+                    <div class="horizontal-info">
+                        <h3>${f.title}</h3>
+                        <p>Автор: ${f.author}</p>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>
