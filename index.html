@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DevGram Pro</title>
+    <title>DevGram Pro v2</title>
     <style>
         :root {
             --tg-theme-bg: #0e1621;
@@ -23,13 +23,11 @@
         .auth-card h2 { text-align: center; margin-bottom: 10px; }
         .auth-card input { padding: 12px; background: var(--tg-theme-bg); border: 1px solid #223242; border-radius: 6px; color: white; outline: none; }
         .auth-card button { padding: 12px; background: var(--tg-theme-button); border: none; border-radius: 6px; color: white; cursor: pointer; font-weight: bold; }
-        .auth-card button:hover { opacity: 0.9; }
-        .error-msg { color: #e53935; font-size: 13px; text-align: center; display: none; }
         
-        /* Стили аватара в реге */
         .avatar-picker { display: flex; flex-direction: column; align-items: center; gap: 10px; }
         .avatar-preview { width: 80px; height: 80px; border-radius: 50%; background: #517da2; display: flex; align-items: center; justify-content: center; font-size: 30px; overflow: hidden; }
         .avatar-preview img { width: 100%; height: 100%; object-fit: cover; }
+        .error-msg { color: #e53935; font-size: 13px; text-align: center; display: none; }
 
         /* Боковая панель */
         .sidebar { width: 80px; background-color: var(--tg-theme-sidebar); display: flex; flex-direction: column; align-items: center; padding: 20px 0; border-right: 1px solid #101921; gap: 25px; }
@@ -73,17 +71,27 @@
         .icon-btn.recording { color: #e53935; animation: blink 1s infinite; }
         .send-btn-9 { background: var(--tg-theme-button); border: none; width: 38px; height: 38px; border-radius: 50%; color: white; font-size: 18px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-        /* Камера фид для кружков */
         #cameraPreviewContainer { display: none; position: absolute; bottom: 70px; left: 20px; width: 150px; height: 150px; border-radius: 50%; overflow: hidden; border: 3px solid var(--tg-theme-button); }
         #cameraPreviewContainer video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* ДевТок */
-        .devtok-container { flex: 1; display: flex; justify-content: center; align-items: center; background: #000; position: relative; }
-        .video-card-vertical { width: 360px; height: 640px; background: #111; border-radius: 16px; position: relative; overflow: hidden; }
+        /* === НОВЫЙ ДЕВТОК С ВЕРТИКАЛЬНЫМ СКОЛЛОМ === */
+        .devtok-screen-wrapper { flex: 1; display: flex; justify-content: center; align-items: center; background: #000; position: relative; }
+        .devtok-viewport { width: 360px; height: 640px; background: #111; border-radius: 16px; overflow-y: scroll; scroll-snap-type: y mandatory; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.7); }
+        /* Скрываем скроллбар */
+        .devtok-viewport::-webkit-scrollbar { display: none; }
+        .devtok-viewport { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .video-card-vertical { width: 100%; height: 100%; scroll-snap-align: start; scroll-snap-stop: always; position: relative; background: #000; }
         .video-card-vertical video { width: 100%; height: 100%; object-fit: cover; }
-        .video-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px; background: linear-gradient(transparent, rgba(0,0,0,0.9)); display: flex; justify-content: space-between; align-items: flex-end; }
+        .video-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px; background: linear-gradient(transparent, rgba(0,0,0,0.9)); display: flex; justify-content: space-between; align-items: flex-end; z-index: 5; }
         .add-friend-btn { background: var(--tg-theme-button); border: none; color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer; margin-top: 5px; font-weight: bold; }
         .upload-floating-btn { position: absolute; top: 20px; right: 20px; background: var(--tg-theme-button); color: white; border: none; padding: 12px 24px; border-radius: 20px; cursor: pointer; font-weight: bold; z-index: 10; }
+
+        /* Всплывающее уведомление о звуке */
+        .audio-request-box { position: absolute; top: 20px; left: 20px; background: rgba(23, 33, 43, 0.95); padding: 12px 15px; border-radius: 10px; display: flex; flex-direction: column; gap: 8px; font-size: 13px; z-index: 20; border: 1px solid var(--tg-theme-button); box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .audio-request-box div { display: flex; gap: 10px; justify-content: flex-end; }
+        .audio-request-box button { background: var(--tg-theme-button); color:white; border:none; padding:4px 10px; border-radius:4px; cursor:pointer; font-weight:bold; }
+        .audio-request-box button.no-btn { background:#4f5b66; }
 
         /* ДевФул */
         .devful-container { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 25px; }
@@ -99,9 +107,7 @@
 </head>
 <body>
 
-    <!-- ЭКРАН РЕГИСТРАЦИИ И ВХОДА -->
     <div id="authOverlay">
-        <!-- Шаг 1: Почта -->
         <div class="auth-card" id="stepEmail">
             <h2>Регистрация</h2>
             <p style="color:var(--tg-theme-hint); text-align:center; font-size:14px;">Введите почту, мы отправим проверочный код</p>
@@ -110,7 +116,6 @@
             <div class="error-msg" id="emailError">Введите корректную почту</div>
         </div>
 
-        <!-- Шаг 2: Код -->
         <div class="auth-card" id="stepCode" style="display:none;">
             <h2>Ввод кода</h2>
             <p style="color:var(--tg-theme-hint); text-align:center; font-size:14px;" id="codeHint"></p>
@@ -119,7 +124,6 @@
             <div class="error-msg" id="codeError">Неверный код!</div>
         </div>
 
-        <!-- Шаг 3: Юзернейм и Аватар -->
         <div class="auth-card" id="stepProfile" style="display:none;">
             <h2>Ваш профиль</h2>
             <div class="avatar-picker">
@@ -133,7 +137,6 @@
         </div>
     </div>
 
-    <!-- ОСНОВНОЙ ИНТЕРФЕЙС ПРИЛОЖЕНИЯ -->
     <div class="sidebar">
         <div class="logo-dev">9</div>
         <button class="nav-btn active" onclick="switchTab('messenger', this)">
@@ -151,16 +154,13 @@
     </div>
 
     <div class="main-content">
-        <!-- МЕССЕНДЖЕР -->
         <div id="messenger" class="screen active">
             <div class="chats-list">
                 <div class="search-bar">
                     <input type="text" id="userSearchInput" placeholder="Поиск по @username...">
                     <button onclick="searchUser()">Найти</button>
                 </div>
-                <div class="chats-container" id="chatsContainer">
-                    <!-- Сюда динамически загружаются чаты -->
-                </div>
+                <div class="chats-container" id="chatsContainer"></div>
             </div>
             
             <div class="chat-window" id="chatWindow" style="display:none;">
@@ -178,27 +178,35 @@
                     <div class="media-actions">
                         <button class="icon-btn" title="Фото" onclick="triggerChatFile('image')">📷</button>
                         <button class="icon-btn" title="Видео" onclick="triggerChatFile('video')">🎥</button>
-                        <button class="icon-btn" id="voiceBtn" title="Удерживать для Голосового">🎙️</button>
-                        <button class="icon-btn" id="circleBtn" title="Нажать для Кружка">⭕</button>
+                        <button class="icon-btn" id="voiceBtn" title="Голосовое">🎙️</button>
+                        <button class="icon-btn" id="circleBtn" title="Кружок">⭕</button>
                     </div>
                     <input type="text" id="messageInput" placeholder="Напишите сообщение...">
                     <button class="send-btn-9" onclick="sendTextMessage()">9</button>
                 </div>
             </div>
             <div style="flex:1; display:flex; justify-content:center; align-items:center; color:var(--tg-theme-hint);" id="noChatPlaceholder">
-                Выберите чат или найдите пользователя через поиск
+                Выберите чат или введите @username в поиске
             </div>
         </div>
 
-        <!-- ДЕВТОК -->
         <div id="devtok" class="screen">
             <button class="upload-floating-btn" onclick="triggerUpload('devtok')">+ Создать ДевТок</button>
-            <div class="devtok-container" id="devtokContainer">
-                <!-- Сюда грузятся видео -->
+            <div class="devtok-screen-wrapper">
+                
+                <div class="audio-request-box" id="audioPrompt" style="display:none;">
+                    <span>🔊 Включить звук для этого ДевТок видео?</span>
+                    <div>
+                        <button class="no-btn" onclick="answerAudio(false)">Нет</button>
+                        <button onclick="answerAudio(true)">Да</button>
+                    </div>
+                </div>
+
+                <div class="devtok-viewport" id="devtokViewport" onscroll="handleDevTokScroll()">
+                    </div>
             </div>
         </div>
 
-        <!-- ДЕВФУЛ -->
         <div id="devful" class="screen">
             <div class="devful-container">
                 <div class="devful-header">
@@ -214,14 +222,19 @@
     <input type="file" id="contentVideoLoader" class="hidden-input" accept="video/*">
 
     <script>
-        // Инициализация базы данных в LocalStorage
+        // Две дефолтных записи для теста бесконечного скролла
+        const defaultVideos = [
+            { author: "@code_boss", src: "https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-light-in-a-futuristic-tunnel-41838-large.mp4", desc: "Пишу код на коленках в кибер-туннеле! #dev" },
+            { author: "@admin", src: "https://assets.mixkit.co/videos/preview/mixkit-tunnel-of-futuristic-blue-lights-42205-large.mp4", desc: "Презентация нового ДевТок движка! Оцени скролл." }
+        ];
+
         if(!localStorage.getItem('dg_users')) {
             localStorage.setItem('dg_users', JSON.stringify({
                 "@admin": { username: "@admin", avatar: "", email: "admin@dev.ru", friends: [], chats: {} },
                 "@code_boss": { username: "@code_boss", avatar: "", email: "boss@dev.ru", friends: [], chats: {} }
             }));
         }
-        if(!localStorage.getItem('dg_devtok')) localStorage.setItem('dg_devtok', JSON.stringify([]));
+        if(!localStorage.getItem('dg_devtok')) localStorage.setItem('dg_devtok', JSON.stringify(defaultVideos));
         if(!localStorage.getItem('dg_devful')) localStorage.setItem('dg_devful', JSON.stringify([]));
 
         let currentUser = localStorage.getItem('dg_current_user') || null;
@@ -230,13 +243,16 @@
         let tempAvatarBase64 = "";
         let activeChatUser = null;
 
-        // Потоки записи медиа
         let mediaRecorder = null;
         let audioChunks = [];
         let videoChunks = [];
         let isRecordingVoice = false;
         let isRecordingCircle = false;
         let circleStream = null;
+
+        // Переменные для звука в ленте
+        let lastCurrentTime = 0;
+        let currentPlayingIndex = -1;
 
         window.onload = function() {
             if (currentUser) {
@@ -245,35 +261,24 @@
             }
         };
 
-        /* --- СИСТЕМА РЕГИСТРАЦИИ --- */
         function sendCodeMock() {
             const email = document.getElementById('authEmail').value;
-            if(!email.includes('@')) {
-                document.getElementById('emailError').style.display = 'block';
-                return;
-            }
+            if(!email.includes('@')) { document.getElementById('emailError').style.display = 'block'; return; }
             tempEmail = email;
             generatedCode = Math.floor(1000 + Math.random() * 9000).toString();
-            
-            // Имитируем отправку на почту через alert
-            alert(`[Имитация письма на ${email}]\nВаш проверочный код доступа: ${generatedCode}`);
-            
+            alert(`[Письмо на ${email}]\nКод авторизации: ${generatedCode}`);
             document.getElementById('stepEmail').style.display = 'none';
             document.getElementById('stepCode').style.display = 'block';
             document.getElementById('codeHint').innerText = `Код отправлен на ${email}`;
         }
 
         function verifyCode() {
-            const code = document.getElementById('authCode').value;
-            if(code === generatedCode) {
+            if(document.getElementById('authCode').value === generatedCode) {
                 document.getElementById('stepCode').style.display = 'none';
                 document.getElementById('stepProfile').style.display = 'block';
-            } else {
-                document.getElementById('codeError').style.display = 'block';
-            }
+            } else { document.getElementById('codeError').style.display = 'block'; }
         }
 
-        // Обработка загрузки аватарки при регистрации
         document.getElementById('avatarFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if(file) {
@@ -289,46 +294,27 @@
         function completeRegistration() {
             let username = document.getElementById('authUsername').value.trim().toLowerCase();
             if(!username.startsWith('@')) username = '@' + username;
-
-            // Валидация юзернейма регуляркой (без пробелов, буквы, цифры, нижнее подчеркивание)
             const usernameRegex = /^@[a-zA-Z0-9_]+$/;
-            
             let users = JSON.parse(localStorage.getItem('dg_users'));
 
             if(!usernameRegex.test(username) || username.length < 3) {
-                showUsernameError("Неверный формат! Только английские буквы, цифры и '_'");
-                return;
+                showUsernameError("Только латиница, цифры и символ '_'"); return;
             }
+            if(users[username]) { showUsernameError("Юзернейм занят!"); return; }
 
-            if(users[username]) {
-                showUsernameError("Этот @username уже занят!");
-                return;
-            }
-
-            // Создаем нового пользователя
-            users[username] = {
-                username: username,
-                avatar: tempAvatarBase64,
-                email: tempEmail,
-                friends: [],
-                chats: {}
-            };
-
+            users[username] = { username: username, avatar: tempAvatarBase64, email: tempEmail, friends: [], chats: {} };
             localStorage.setItem('dg_users', JSON.stringify(users));
             localStorage.setItem('dg_current_user', username);
             currentUser = username;
-
             document.getElementById('authOverlay').style.display = 'none';
             initApp();
         }
 
         function showUsernameError(text) {
             const err = document.getElementById('usernameError');
-            err.innerText = text;
-            err.style.display = 'block';
+            err.innerText = text; err.style.display = 'block';
         }
 
-        /* --- СТАРТ ПРИЛОЖЕНИЯ И НАВИГАЦИЯ --- */
         function initApp() {
             renderChatsList();
             renderDevTok();
@@ -342,30 +328,22 @@
             document.getElementById(screenId).classList.add('active');
             button.classList.add('active');
 
-            const devtokVid = document.querySelector('.video-card-vertical video');
-            if(devtokVid) {
-                if(screenId === 'devtok') devtokVid.play();
-                else devtokVid.pause();
+            if(screenId === 'devtok') {
+                handleDevTokScroll(); // Запуск плеера при переходе на вкладку
+            } else {
+                stopAllDevTokVideos();
             }
         }
 
-        /* --- ПОИСК И ЧАТЫ --- */
+        /* --- ЧАТЫ И ПОИСК --- */
         function searchUser() {
             const searchVal = document.getElementById('userSearchInput').value.trim().toLowerCase();
             let formattedSearch = searchVal.startsWith('@') ? searchVal : '@' + searchVal;
-
             let users = JSON.parse(localStorage.getItem('dg_users'));
 
-            if(formattedSearch === currentUser) {
-                alert("Вы не можете искать самого себя");
-                return;
-            }
-
-            if(users[formattedSearch]) {
-                openChat(formattedSearch);
-            } else {
-                alert("Пользователь с таким @username не найден!");
-            }
+            if(formattedSearch === currentUser) { alert("Вы нашли себя!"); return; }
+            if(users[formattedSearch]) { openChat(formattedSearch); } 
+            else { alert("Пользователь не найден!"); }
         }
 
         function openChat(username) {
@@ -381,17 +359,12 @@
             if(targetUser.avatar) avatarDiv.innerHTML = `<img src="${targetUser.avatar}">`;
             else avatarDiv.innerHTML = username.substring(1,3).toUpperCase();
 
-            // Кнопка друзей
-            let me = users[currentUser];
             const fBtn = document.getElementById('chatFriendBtn');
-            if(me.friends.includes(username)) {
-                fBtn.innerText = "В друзьях";
-                fBtn.style.background = "#4ab54a";
+            if(users[currentUser].friends.includes(username)) {
+                fBtn.innerText = "В друзьях"; fBtn.style.background = "#4ab54a";
             } else {
-                fBtn.innerText = "Добавить в друзья";
-                fBtn.style.background = "var(--tg-theme-button)";
+                fBtn.innerText = "Добавить в друзья"; fBtn.style.background = "var(--tg-theme-button)";
             }
-
             renderMessages();
             renderChatsList();
         }
@@ -399,30 +372,22 @@
         function toggleFriendInChat() {
             let users = JSON.parse(localStorage.getItem('dg_users'));
             let me = users[currentUser];
-
-            if(me.friends.includes(activeChatUser)) {
-                me.friends = me.friends.filter(f => f !== activeChatUser);
-            } else {
-                me.friends.push(activeChatUser);
-            }
-
+            if(me.friends.includes(activeChatUser)) { me.friends = me.friends.filter(f => f !== activeChatUser); } 
+            else { me.friends.push(activeChatUser); }
             localStorage.setItem('dg_users', JSON.stringify(users));
             openChat(activeChatUser);
-            renderDevTok(); // Обновляем кнопку в ленте если там этот юзер
+            renderDevTok();
         }
 
         function saveMessage(msgObj) {
             let users = JSON.parse(localStorage.getItem('dg_users'));
-            
             if(!users[currentUser].chats) users[currentUser].chats = {};
             if(!users[activeChatUser].chats) users[activeChatUser].chats = {};
-
             if(!users[currentUser].chats[activeChatUser]) users[currentUser].chats[activeChatUser] = [];
             if(!users[activeChatUser].chats[currentUser]) users[activeChatUser].chats[currentUser] = [];
 
             users[currentUser].chats[activeChatUser].push(msgObj);
             users[activeChatUser].chats[currentUser].push(msgObj);
-
             localStorage.setItem('dg_users', JSON.stringify(users));
             renderMessages();
             renderChatsList();
@@ -432,18 +397,16 @@
             const container = document.getElementById('chatMessages');
             container.innerHTML = '';
             let users = JSON.parse(localStorage.getItem('dg_users'));
-            let history = (users[currentUser].chats && users[currentUser].chats[activeChatUser]) ? users[currentUser].chats[activeChatUser] : [];
+            let history = users[currentUser].chats[activeChatUser] || [];
 
             history.forEach(m => {
                 const div = document.createElement('div');
                 div.className = `msg ${m.sender === currentUser ? 'out' : 'in'}`;
-                
                 if(m.type === 'text') div.innerText = m.content;
                 if(m.type === 'image') div.innerHTML = `<img src="${m.content}">`;
                 if(m.type === 'video') div.innerHTML = `<video src="${m.content}" controls></video>`;
                 if(m.type === 'voice') div.innerHTML = `<audio src="${m.content}" controls></audio>`;
                 if(m.type === 'circle') div.innerHTML = `<video class="circle-video" src="${m.content}" autoplay loop muted controls></video>`;
-
                 container.appendChild(div);
             });
             container.scrollTop = container.scrollHeight;
@@ -459,17 +422,11 @@
                 const item = document.createElement('div');
                 item.className = `chat-item ${activeChatUser === username ? 'active' : ''}`;
                 item.onclick = () => openChat(username);
-
                 let uData = users[username] || { avatar: "" };
                 let lastMsg = myChats[username][myChats[username].length - 1];
-                let previewText = lastMsg.type === 'text' ? lastMsg.content : `[Медиафайл]`;
-
                 item.innerHTML = `
                     <div class="avatar">${uData.avatar ? `<img src="${uData.avatar}">` : username.substring(1,3).toUpperCase()}</div>
-                    <div class="chat-info">
-                        <h4>${username}</h4>
-                        <p>${previewText}</p>
-                    </div>
+                    <div class="chat-info"><h4>${username}</h4><p>${lastMsg.type === 'text' ? lastMsg.content : '[Медиа]'}</p></div>
                 `;
                 container.appendChild(item);
             });
@@ -478,16 +435,10 @@
         function sendTextMessage() {
             const input = document.getElementById('messageInput');
             if(!input.value.trim() || !activeChatUser) return;
-            
-            saveMessage({
-                sender: currentUser,
-                type: 'text',
-                content: input.value
-            });
+            saveMessage({ sender: currentUser, type: 'text', content: input.value });
             input.value = '';
         }
 
-        /* --- ЗАПИСЬ НАСТОЯЩЕГО ГОЛОСА И КРУЖКОВ (МЕДИА) --- */
         function triggerChatFile(type) {
             const loader = document.getElementById('chatFileLoader');
             loader.accept = type === 'image' ? 'image/*' : 'video/*';
@@ -496,11 +447,7 @@
                 if(file) {
                     const reader = new FileReader();
                     reader.onload = function(event) {
-                        saveMessage({
-                            sender: currentUser,
-                            type: type,
-                            content: event.target.result
-                        });
+                        saveMessage({ sender: currentUser, type: type, content: event.target.result });
                     };
                     reader.readAsDataURL(file);
                 }
@@ -512,7 +459,6 @@
             const voiceBtn = document.getElementById('voiceBtn');
             const circleBtn = document.getElementById('circleBtn');
 
-            // Настоящее голосовое через удержание / клик
             voiceBtn.addEventListener('click', async () => {
                 if (!isRecordingVoice) {
                     try {
@@ -521,60 +467,127 @@
                         audioChunks = [];
                         mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
                         mediaRecorder.onstop = () => {
-                            const blob = new Blob(audioChunks, { type: 'audio/ogg; codecs=opus' });
+                            const blob = new Blob(audioChunks, { type: 'audio/ogg;' });
                             const reader = new FileReader();
-                            reader.onloadend = () => {
-                                saveMessage({ sender: currentUser, type: 'voice', content: reader.result });
-                            };
+                            reader.onloadend = () => { saveMessage({ sender: currentUser, type: 'voice', content: reader.result }); };
                             reader.readAsDataURL(blob);
-                            stream.getTracks().forEach(track => track.stop());
+                            stream.getTracks().forEach(t => t.stop());
                         };
                         mediaRecorder.start();
-                        isRecordingVoice = true;
-                        voiceBtn.classList.add('recording');
-                    } catch(e) { alert("Микрофон недоступен или заблокирован."); }
-                } else {
-                    mediaRecorder.stop();
-                    isRecordingVoice = false;
-                    voiceBtn.classList.remove('recording');
-                }
+                        isRecordingVoice = true; voiceBtn.classList.add('recording');
+                    } catch(e) { alert("Микрофон заблокирован."); }
+                } else { mediaRecorder.stop(); isRecordingVoice = false; voiceBtn.classList.remove('recording'); }
             });
 
-            // Настоящие Кружки Видео
             circleBtn.addEventListener('click', async () => {
                 if(!isRecordingCircle) {
                     try {
                         circleStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                         document.getElementById('cameraPreviewContainer').style.display = 'block';
                         document.getElementById('cameraPreview').srcObject = circleStream;
-                        
                         mediaRecorder = new MediaRecorder(circleStream);
                         videoChunks = [];
                         mediaRecorder.ondataavailable = e => videoChunks.push(e.data);
                         mediaRecorder.onstop = () => {
                             const blob = new Blob(videoChunks, { type: 'video/mp4' });
                             const reader = new FileReader();
-                            reader.onloadend = () => {
-                                saveMessage({ sender: currentUser, type: 'circle', content: reader.result });
-                            };
+                            reader.onloadend = () => { saveMessage({ sender: currentUser, type: 'circle', content: reader.result }); };
                             reader.readAsDataURL(blob);
-                            circleStream.getTracks().forEach(track => track.stop());
+                            circleStream.getTracks().forEach(t => t.stop());
                             document.getElementById('cameraPreviewContainer').style.display = 'none';
                         };
-                        
                         mediaRecorder.start();
-                        isRecordingCircle = true;
-                        circleBtn.classList.add('recording');
-                    } catch(e) { alert("Камера/Микрофон недоступны."); }
-                } else {
-                    mediaRecorder.stop();
-                    isRecordingCircle = false;
-                    circleBtn.classList.remove('recording');
+                        isRecordingCircle = true; circleBtn.classList.add('recording');
+                    } catch(e) { alert("Камера недоступна."); }
+                } else { mediaRecorder.stop(); isRecordingCircle = false; circleBtn.classList.remove('recording'); }
+            });
+        }
+
+        /* --- ЛЕНТА ДЕВТОК (ВЕРТИКАЛЬНАЯ И С ЗВУКОМ) --- */
+        function renderDevTok() {
+            const viewport = document.getElementById('devtokViewport');
+            viewport.innerHTML = '';
+            let toks = JSON.parse(localStorage.getItem('dg_devtok'));
+            let users = JSON.parse(localStorage.getItem('dg_users'));
+
+            toks.forEach((t, idx) => {
+                let isFriend = users[currentUser].friends.includes(t.author);
+                const card = document.createElement('div');
+                card.className = 'video-card-vertical';
+                card.setAttribute('data-index', idx);
+                card.innerHTML = `
+                    <video src="${t.src}" loop muted playsinline></video>
+                    <div class="video-overlay">
+                        <div class="author-info">
+                            <h3>${t.author}</h3>
+                            <p>${t.desc}</p>
+                            ${t.author !== currentUser ? `<button class="add-friend-btn" onclick="toggleFriendFromFeed('${t.author}')">${isFriend ? 'В друзьях' : 'Добавить в друзья'}</button>` : ''}
+                        </div>
+                    </div>
+                `;
+                viewport.appendChild(card);
+            });
+        }
+
+        // Логика перелистывания вверх и вниз
+        function handleDevTokScroll() {
+            const viewport = document.getElementById('devtokViewport');
+            const cards = document.querySelectorAll('.video-card-vertical');
+            let viewportHeight = viewport.clientHeight;
+            
+            cards.forEach(card => {
+                let rect = card.getBoundingClientRect();
+                let parentRect = viewport.getBoundingClientRect();
+                let topOffset = rect.top - parentRect.top;
+                
+                // Проверяем, какая карточка зафиксирована на экране
+                if (topOffset >= -10 && topOffset <= 10) {
+                    let index = parseInt(card.getAttribute('data-index'));
+                    if (currentPlayingIndex !== index) {
+                        stopAllDevTokVideos();
+                        currentPlayingIndex = index;
+                        
+                        let video = card.querySelector('video');
+                        video.play();
+
+                        // Показываем плашку запроса звука
+                        let prompt = document.getElementById('audioPrompt');
+                        prompt.style.display = 'flex';
+                    }
                 }
             });
         }
 
-        /* --- ЛЕНТЫ ДЕВТОК И ДЕВФУЛ --- */
+        function answerAudio(wantSound) {
+            document.getElementById('audioPrompt').style.display = 'none';
+            const currentCard = document.querySelector(`.video-card-vertical[data-index="${currentPlayingIndex}"]`);
+            if (currentCard) {
+                let video = currentCard.querySelector('video');
+                if (wantSound) {
+                    video.muted = false;
+                    video.currentTime = 0; // Перезапускаем сначала, чтобы пользователь услышал всё со звуком
+                    video.play();
+                } else {
+                    video.muted = true;
+                }
+            }
+        }
+
+        function stopAllDevTokVideos() {
+            document.querySelectorAll('.video-card-vertical video').forEach(v => {
+                v.pause();
+                v.muted = true;
+            });
+            document.getElementById('audioPrompt').style.display = 'none';
+            currentPlayingIndex = -1;
+        }
+
+        function toggleFriendFromFeed(author) {
+            activeChatUser = author;
+            toggleFriendInChat();
+        }
+
+        /* --- ЗАГРУЗКА ДЛЯ ДЕВТОК И ДЕВФУЛ --- */
         let uploadTarget = "";
         function triggerUpload(target) {
             uploadTarget = target;
@@ -592,86 +605,39 @@
             videoElement.onloadedmetadata = function() {
                 URL.revokeObjectURL(videoElement.src);
                 const duration = videoElement.duration;
-
                 const reader = new FileReader();
-                reader.onload = function(event) {
-                    const videoBase64 = event.target.result;
 
+                reader.onload = function(event) {
                     if(uploadTarget === 'devtok') {
-                        if(duration > 60) {
-                            alert("Ошибка! Видео в ДевТок должно быть строго до 1 минуты.");
-                            return;
-                        }
+                        if(duration > 60) { alert("Ошибка! ДевТок принимает видео только до 1 минуты."); return; }
                         let toks = JSON.parse(localStorage.getItem('dg_devtok'));
-                        toks.unshift({ author: currentUser, src: videoBase64, desc: file.name });
+                        toks.unshift({ author: currentUser, src: event.target.result, desc: file.name });
                         localStorage.setItem('dg_devtok', JSON.stringify(toks));
                         renderDevTok();
+                        document.getElementById('devtokViewport').scrollTop = 0; // Скроллим наверх к новому видео
+                        handleDevTokScroll();
                     } else {
                         let fuls = JSON.parse(localStorage.getItem('dg_devful'));
-                        fuls.unshift({ author: currentUser, src: videoBase64, title: file.name.split('.')[0] });
+                        fuls.unshift({ author: currentUser, src: event.target.result, title: file.name.split('.')[0] });
                         localStorage.setItem('dg_devful', JSON.stringify(fuls));
                         renderDevFul();
                     }
+                    alert("Успешно опубликовано!");
                 };
                 reader.readAsDataURL(file);
             };
         });
 
-        function renderDevTok() {
-            const container = document.getElementById('devtokContainer');
-            container.innerHTML = '';
-            let toks = JSON.parse(localStorage.getItem('dg_devtok'));
-            let users = JSON.parse(localStorage.getItem('dg_users'));
-
-            if(toks.length === 0) {
-                container.innerHTML = `<div style="color:gray;">Тут пока ничего нет. Будьте первыми!</div>`;
-                return;
-            }
-
-            // Показываем первое актуальное видео из ленты
-            let t = toks[0]; 
-            let isFriend = users[currentUser].friends.includes(t.author);
-
-            const card = document.createElement('div');
-            card.className = 'video-card-vertical';
-            card.innerHTML = `
-                <video src="${t.src}" loop autoplay muted controls></video>
-                <div class="video-overlay">
-                    <div class="author-info">
-                        <h3>${t.author}</h3>
-                        <p>${t.desc}</p>
-                        ${t.author !== currentUser ? `<button class="add-friend-btn" onclick="toggleFriendFromFeed('${t.author}')">${isFriend ? 'В друзьях' : 'Добавить в друзья'}</button>` : ''}
-                    </div>
-                </div>
-            `;
-            container.appendChild(card);
-        }
-
-        function toggleFriendFromFeed(author) {
-            activeChatUser = author;
-            toggleFriendInChat();
-        }
-
         function renderDevFul() {
             const grid = document.getElementById('devfulGrid');
             grid.innerHTML = '';
             let fuls = JSON.parse(localStorage.getItem('dg_devful'));
-
-            if(fuls.length === 0) {
-                grid.innerHTML = `<div style="color:gray;">Нет загруженных длинных видео.</div>`;
-                return;
-            }
+            if(fuls.length === 0) { grid.innerHTML = `<div style="color:gray;">Нет длинных видео.</div>`; return; }
 
             fuls.forEach(f => {
                 const card = document.createElement('div');
                 card.className = 'video-card-horizontal';
-                card.innerHTML = `
-                    <video src="${f.src}" controls></video>
-                    <div class="horizontal-info">
-                        <h3>${f.title}</h3>
-                        <p>Автор: ${f.author}</p>
-                    </div>
-                `;
+                card.innerHTML = `<video src="${f.src}" controls></video><div class="horizontal-info"><h3>${f.title}</h3><p>Автор: ${f.author}</p></div>`;
                 grid.appendChild(card);
             });
         }
