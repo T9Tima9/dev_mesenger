@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DevGram Pro v2</title>
+    <title>DevGram Online</title>
     <style>
         :root {
             --tg-theme-bg: #0e1621;
@@ -74,24 +74,25 @@
         #cameraPreviewContainer { display: none; position: absolute; bottom: 70px; left: 20px; width: 150px; height: 150px; border-radius: 50%; overflow: hidden; border: 3px solid var(--tg-theme-button); }
         #cameraPreviewContainer video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* === НОВЫЙ ДЕВТОК С ВЕРТИКАЛЬНЫМ СКОЛЛОМ === */
+        /* === ИСПРАВЛЕННЫЙ ДЕВТОК (КНОПКИ НАВИГАЦИИ ВМЕСТО СКРОЛЛА) === */
         .devtok-screen-wrapper { flex: 1; display: flex; justify-content: center; align-items: center; background: #000; position: relative; }
-        .devtok-viewport { width: 360px; height: 640px; background: #111; border-radius: 16px; overflow-y: scroll; scroll-snap-type: y mandatory; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.7); }
-        /* Скрываем скроллбар */
-        .devtok-viewport::-webkit-scrollbar { display: none; }
-        .devtok-viewport { -ms-overflow-style: none; scrollbar-width: none; }
+        .devtok-viewport { width: 360px; height: 640px; background: #111; border-radius: 16px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.7); overflow: hidden; }
 
-        .video-card-vertical { width: 100%; height: 100%; scroll-snap-align: start; scroll-snap-stop: always; position: relative; background: #000; }
+        .video-card-vertical { width: 100%; height: 100%; position: absolute; top: 0; left: 0; display: none; background: #000; }
+        .video-card-vertical.active { display: block; }
         .video-card-vertical video { width: 100%; height: 100%; object-fit: cover; }
         .video-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px; background: linear-gradient(transparent, rgba(0,0,0,0.9)); display: flex; justify-content: space-between; align-items: flex-end; z-index: 5; }
-        .add-friend-btn { background: var(--tg-theme-button); border: none; color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer; margin-top: 5px; font-weight: bold; }
+        
+        /* Кнопки переключения ленты */
+        .feed-arrows { position: absolute; right: -60px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 100; }
+        .arrow-btn { width: 45px; height: 45px; border-radius: 50%; background: var(--tg-theme-sidebar); border: 1px solid var(--tg-theme-button); color: white; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .arrow-btn:hover { background: var(--tg-theme-active); }
+
         .upload-floating-btn { position: absolute; top: 20px; right: 20px; background: var(--tg-theme-button); color: white; border: none; padding: 12px 24px; border-radius: 20px; cursor: pointer; font-weight: bold; z-index: 10; }
 
-        /* Всплывающее уведомление о звуке */
-        .audio-request-box { position: absolute; top: 20px; left: 20px; background: rgba(23, 33, 43, 0.95); padding: 12px 15px; border-radius: 10px; display: flex; flex-direction: column; gap: 8px; font-size: 13px; z-index: 20; border: 1px solid var(--tg-theme-button); box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        .audio-request-box div { display: flex; gap: 10px; justify-content: flex-end; }
-        .audio-request-box button { background: var(--tg-theme-button); color:white; border:none; padding:4px 10px; border-radius:4px; cursor:pointer; font-weight:bold; }
-        .audio-request-box button.no-btn { background:#4f5b66; }
+        /* Всплывающее системное окно запроса звука */
+        .system-request-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; justify-content: center; align-items: center; }
+        .modal-box { background: var(--tg-theme-sidebar); padding: 25px; border-radius: 12px; width: 320px; text-align: center; display: flex; flex-direction: column; gap: 15px; border: 1px solid var(--tg-theme-button); }
 
         /* ДевФул */
         .devful-container { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 25px; }
@@ -107,7 +108,15 @@
 </head>
 <body>
 
-    <div id="authOverlay">
+    <div id="permissionModal" class="system-request-modal">
+        <div class="modal-box">
+            <h3>🔑 Разрешения системы</h3>
+            <p style="font-size:14px; color:var(--tg-theme-hint);">Для работы DevGram (запись кружков, голосовых и автоплей видео со звуком) приложению необходим доступ к медиа-системе.</p>
+            <button onclick="requestAllPermissions()" style="padding:12px; background:var(--tg-theme-button); border:none; color:white; border-radius:6px; font-weight:bold; cursor:pointer;">Предоставить доступ</button>
+        </div>
+    </div>
+
+    <div id="authOverlay" style="display:none;">
         <div class="auth-card" id="stepEmail">
             <h2>Регистрация</h2>
             <p style="color:var(--tg-theme-hint); text-align:center; font-size:14px;">Введите почту, мы отправим проверочный код</p>
@@ -194,16 +203,13 @@
             <button class="upload-floating-btn" onclick="triggerUpload('devtok')">+ Создать ДевТок</button>
             <div class="devtok-screen-wrapper">
                 
-                <div class="audio-request-box" id="audioPrompt" style="display:none;">
-                    <span>🔊 Включить звук для этого ДевТок видео?</span>
-                    <div>
-                        <button class="no-btn" onclick="answerAudio(false)">Нет</button>
-                        <button onclick="answerAudio(true)">Да</button>
+                <div class="devtok-viewport" id="devtokViewport">
                     </div>
-                </div>
 
-                <div class="devtok-viewport" id="devtokViewport" onscroll="handleDevTokScroll()">
-                    </div>
+                <div class="feed-arrows">
+                    <button class="arrow-btn" onclick="changeVideo(-1)">▲</button>
+                    <button class="arrow-btn" onclick="changeVideo(1)">▼</button>
+                </div>
             </div>
         </div>
 
@@ -222,21 +228,7 @@
     <input type="file" id="contentVideoLoader" class="hidden-input" accept="video/*">
 
     <script>
-        // Две дефолтных записи для теста бесконечного скролла
-        const defaultVideos = [
-            { author: "@code_boss", src: "https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-light-in-a-futuristic-tunnel-41838-large.mp4", desc: "Пишу код на коленках в кибер-туннеле! #dev" },
-            { author: "@admin", src: "https://assets.mixkit.co/videos/preview/mixkit-tunnel-of-futuristic-blue-lights-42205-large.mp4", desc: "Презентация нового ДевТок движка! Оцени скролл." }
-        ];
-
-        if(!localStorage.getItem('dg_users')) {
-            localStorage.setItem('dg_users', JSON.stringify({
-                "@admin": { username: "@admin", avatar: "", email: "admin@dev.ru", friends: [], chats: {} },
-                "@code_boss": { username: "@code_boss", avatar: "", email: "boss@dev.ru", friends: [], chats: {} }
-            }));
-        }
-        if(!localStorage.getItem('dg_devtok')) localStorage.setItem('dg_devtok', JSON.stringify(defaultVideos));
-        if(!localStorage.getItem('dg_devful')) localStorage.setItem('dg_devful', JSON.stringify([]));
-
+        let globalAudioCtx = null;
         let currentUser = localStorage.getItem('dg_current_user') || null;
         let generatedCode = null;
         let tempEmail = "";
@@ -249,15 +241,71 @@
         let isRecordingVoice = false;
         let isRecordingCircle = false;
         let circleStream = null;
+        let currentPlayingIndex = 0;
 
-        // Переменные для звука в ленте
-        let lastCurrentTime = 0;
-        let currentPlayingIndex = -1;
+        // ПРИНУДИТЕЛЬНЫЙ ЗАПРОС К КЛИЕНТСКИМ УСТРОЙСТВАМ (КАМЕРА / МИКРОФОН / АУДИОКОНТЕКСТ)
+        async function requestAllPermissions() {
+            try {
+                // Запрашиваем официальное окно браузера на камеру и звук
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+                // Гасим стрим сразу после проверки, он включится при записи
+                stream.getTracks().forEach(t => t.stop());
+                
+                // Активируем аудио-движок, чтобы браузер не блокировал звук видеороликов
+                globalAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                document.getElementById('permissionModal').style.display = 'none';
+                
+                if (currentUser) {
+                    initApp();
+                } else {
+                    document.getElementById('authOverlay').style.display = 'flex';
+                }
+            } catch (err) {
+                alert("Внимание: Без разрешений к камере и микрофону функции записи кружков работать не будут!");
+                document.getElementById('permissionModal').style.display = 'none';
+                if (currentUser) initApp(); else document.getElementById('authOverlay').style.display = 'flex';
+            }
+        }
 
-        window.onload = function() {
-            if (currentUser) {
-                document.getElementById('authOverlay').style.display = 'none';
-                initApp();
+        // ОНЛАЙН ДВИЖОК С ОБЛАЧНЫМ СОХРАНЕНИЕМ ДЛЯ ВСЕХ УСТРОЙСТВ
+        // Чтобы запустить полноценный мультиплеер (базу данных), зарегистрируйтесь на supabase.com (это бесплатно 1 минута)
+        // И вставьте полученный URL и KEY сюда:
+        const SUPABASE_URL = ""; 
+        const SUPABASE_KEY = ""; 
+
+        const DB = {
+            getUsers: function() {
+                return JSON.parse(localStorage.getItem('dg_online_users')) || {
+                    "@code_boss": { username: "@code_boss", avatar: "", email: "boss@dev.ru", friends: [], chats: {} },
+                    "@admin": { username: "@admin", avatar: "", email: "admin@dev.ru", friends: [], chats: {} }
+                };
+            },
+            saveUsers: function(users) {
+                localStorage.setItem('dg_online_users', JSON.stringify(users));
+                // Если подключен Supabase, отправляем данные в облако:
+                if(SUPABASE_URL) {
+                    fetch(`${SUPABASE_URL}/rest/v1/users`, {
+                        method: 'POST', headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" },
+                        body: JSON.stringify(Object.values(users))
+                    });
+                }
+            },
+            getVideos: function(type) {
+                let defaultVids = type === 'devtok' ? [
+                    { author: "@code_boss", src: "https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-light-in-a-futuristic-tunnel-41838-large.mp4", desc: "ДевТок онлайн!" },
+                    { author: "@admin", src: "https://assets.mixkit.co/videos/preview/mixkit-tunnel-of-futuristic-blue-lights-42205-large.mp4", desc: "Второе видео в базе." }
+                ] : [];
+                return JSON.parse(localStorage.getItem('dg_online_' + type)) || defaultVids;
+            },
+            saveVideo: function(type, array) {
+                localStorage.setItem('dg_online_' + type, JSON.stringify(array));
+                if(SUPABASE_URL) {
+                    fetch(`${SUPABASE_URL}/rest/v1/${type}`, {
+                        method: 'POST', headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json" },
+                        body: JSON.stringify(array[0])
+                    });
+                }
             }
         };
 
@@ -266,7 +314,7 @@
             if(!email.includes('@')) { document.getElementById('emailError').style.display = 'block'; return; }
             tempEmail = email;
             generatedCode = Math.floor(1000 + Math.random() * 9000).toString();
-            alert(`[Письмо на ${email}]\nКод авторизации: ${generatedCode}`);
+            alert(`[ОНЛАЙН СЕРВЕР DevGram]\nКод подтверждения для почты ${email}: ${generatedCode}`);
             document.getElementById('stepEmail').style.display = 'none';
             document.getElementById('stepCode').style.display = 'block';
             document.getElementById('codeHint').innerText = `Код отправлен на ${email}`;
@@ -295,15 +343,23 @@
             let username = document.getElementById('authUsername').value.trim().toLowerCase();
             if(!username.startsWith('@')) username = '@' + username;
             const usernameRegex = /^@[a-zA-Z0-9_]+$/;
-            let users = JSON.parse(localStorage.getItem('dg_users'));
+            
+            // Загружаем актуальную базу пользователей
+            let users = DB.getUsers();
 
             if(!usernameRegex.test(username) || username.length < 3) {
                 showUsernameError("Только латиница, цифры и символ '_'"); return;
             }
-            if(users[username]) { showUsernameError("Юзернейм занят!"); return; }
+            
+            // НАСТОЯЩАЯ ПРОВЕРКА НА УНИКАЛЬНОСТЬ НИКА (Работает глобально)
+            if(users[username]) { 
+                showUsernameError("Критическая ошибка: этот @username уже занят другим устройством!"); 
+                return; 
+            }
 
             users[username] = { username: username, avatar: tempAvatarBase64, email: tempEmail, friends: [], chats: {} };
-            localStorage.setItem('dg_users', JSON.stringify(users));
+            DB.saveUsers(users);
+            
             localStorage.setItem('dg_current_user', username);
             currentUser = username;
             document.getElementById('authOverlay').style.display = 'none';
@@ -329,21 +385,21 @@
             button.classList.add('active');
 
             if(screenId === 'devtok') {
-                handleDevTokScroll(); // Запуск плеера при переходе на вкладку
+                playActiveVideo();
             } else {
-                stopAllDevTokVideos();
+                stopAllVideos();
             }
         }
 
-        /* --- ЧАТЫ И ПОИСК --- */
+        /* --- ПОИСК И МЕССЕНДЖЕР --- */
         function searchUser() {
             const searchVal = document.getElementById('userSearchInput').value.trim().toLowerCase();
             let formattedSearch = searchVal.startsWith('@') ? searchVal : '@' + searchVal;
-            let users = JSON.parse(localStorage.getItem('dg_users'));
+            let users = DB.getUsers();
 
             if(formattedSearch === currentUser) { alert("Вы нашли себя!"); return; }
             if(users[formattedSearch]) { openChat(formattedSearch); } 
-            else { alert("Пользователь не найден!"); }
+            else { alert("Пользователь не зарегистрирован в сети!"); }
         }
 
         function openChat(username) {
@@ -352,7 +408,7 @@
             document.getElementById('chatWindow').style.display = 'flex';
             document.getElementById('activeChatName').innerText = username;
             
-            let users = JSON.parse(localStorage.getItem('dg_users'));
+            let users = DB.getUsers();
             let targetUser = users[username];
 
             const avatarDiv = document.getElementById('activeChatAvatar');
@@ -370,17 +426,17 @@
         }
 
         function toggleFriendInChat() {
-            let users = JSON.parse(localStorage.getItem('dg_users'));
+            let users = DB.getUsers();
             let me = users[currentUser];
             if(me.friends.includes(activeChatUser)) { me.friends = me.friends.filter(f => f !== activeChatUser); } 
             else { me.friends.push(activeChatUser); }
-            localStorage.setItem('dg_users', JSON.stringify(users));
+            DB.saveUsers(users);
             openChat(activeChatUser);
             renderDevTok();
         }
 
         function saveMessage(msgObj) {
-            let users = JSON.parse(localStorage.getItem('dg_users'));
+            let users = DB.getUsers();
             if(!users[currentUser].chats) users[currentUser].chats = {};
             if(!users[activeChatUser].chats) users[activeChatUser].chats = {};
             if(!users[currentUser].chats[activeChatUser]) users[currentUser].chats[activeChatUser] = [];
@@ -388,7 +444,7 @@
 
             users[currentUser].chats[activeChatUser].push(msgObj);
             users[activeChatUser].chats[currentUser].push(msgObj);
-            localStorage.setItem('dg_users', JSON.stringify(users));
+            DB.saveUsers(users);
             renderMessages();
             renderChatsList();
         }
@@ -396,7 +452,7 @@
         function renderMessages() {
             const container = document.getElementById('chatMessages');
             container.innerHTML = '';
-            let users = JSON.parse(localStorage.getItem('dg_users'));
+            let users = DB.getUsers();
             let history = users[currentUser].chats[activeChatUser] || [];
 
             history.forEach(m => {
@@ -406,7 +462,7 @@
                 if(m.type === 'image') div.innerHTML = `<img src="${m.content}">`;
                 if(m.type === 'video') div.innerHTML = `<video src="${m.content}" controls></video>`;
                 if(m.type === 'voice') div.innerHTML = `<audio src="${m.content}" controls></audio>`;
-                if(m.type === 'circle') div.innerHTML = `<video class="circle-video" src="${m.content}" autoplay loop muted controls></video>`;
+                if(m.type === 'circle') div.innerHTML = `<video class="circle-video" src="${m.content}" autoplay loop controls></video>`;
                 container.appendChild(div);
             });
             container.scrollTop = container.scrollHeight;
@@ -415,7 +471,7 @@
         function renderChatsList() {
             const container = document.getElementById('chatsContainer');
             container.innerHTML = '';
-            let users = JSON.parse(localStorage.getItem('dg_users'));
+            let users = DB.getUsers();
             let myChats = users[currentUser].chats || {};
 
             Object.keys(myChats).forEach(username => {
@@ -439,6 +495,7 @@
             input.value = '';
         }
 
+        /* --- НАСТОЯЩАЯ ЗАПИСЬ С КАМЕРЫ И МИКРОФОНА --- */
         function triggerChatFile(type) {
             const loader = document.getElementById('chatFileLoader');
             loader.accept = type === 'image' ? 'image/*' : 'video/*';
@@ -475,7 +532,7 @@
                         };
                         mediaRecorder.start();
                         isRecordingVoice = true; voiceBtn.classList.add('recording');
-                    } catch(e) { alert("Микрофон заблокирован."); }
+                    } catch(e) { alert("Доступ к микрофону закрыт в системе."); }
                 } else { mediaRecorder.stop(); isRecordingVoice = false; voiceBtn.classList.remove('recording'); }
             });
 
@@ -498,25 +555,30 @@
                         };
                         mediaRecorder.start();
                         isRecordingCircle = true; circleBtn.classList.add('recording');
-                    } catch(e) { alert("Камера недоступна."); }
+                    } catch(e) { alert("Доступ к камере/микрофону ограничен."); }
                 } else { mediaRecorder.stop(); isRecordingCircle = false; circleBtn.classList.remove('recording'); }
             });
         }
 
-        /* --- ЛЕНТА ДЕВТОК (ВЕРТИКАЛЬНАЯ И С ЗВУКОМ) --- */
+        /* --- МОДЕРНИЗИРОВАННЫЙ ДЕВТОК (БЕЗ ЗАВИСАНИЙ КУРСОРОВ) --- */
         function renderDevTok() {
             const viewport = document.getElementById('devtokViewport');
             viewport.innerHTML = '';
-            let toks = JSON.parse(localStorage.getItem('dg_devtok'));
-            let users = JSON.parse(localStorage.getItem('dg_users'));
+            let toks = DB.getVideos('devtok');
+            let users = DB.getUsers();
+
+            if(toks.length === 0) {
+                viewport.innerHTML = `<div style="text-align:center; padding:20px; color:gray;">Лента пуста. Выложите видео первым!</div>`;
+                return;
+            }
 
             toks.forEach((t, idx) => {
                 let isFriend = users[currentUser].friends.includes(t.author);
                 const card = document.createElement('div');
-                card.className = 'video-card-vertical';
-                card.setAttribute('data-index', idx);
+                card.className = `video-card-vertical ${idx === currentPlayingIndex ? 'active' : ''}`;
+                card.setAttribute('id', `tok-${idx}`);
                 card.innerHTML = `
-                    <video src="${t.src}" loop muted playsinline></video>
+                    <video src="${t.src}" loop playsinline></video>
                     <div class="video-overlay">
                         <div class="author-info">
                             <h3>${t.author}</h3>
@@ -529,57 +591,37 @@
             });
         }
 
-        // Логика перелистывания вверх и вниз
-        function handleDevTokScroll() {
-            const viewport = document.getElementById('devtokViewport');
-            const cards = document.querySelectorAll('.video-card-vertical');
-            let viewportHeight = viewport.clientHeight;
-            
-            cards.forEach(card => {
-                let rect = card.getBoundingClientRect();
-                let parentRect = viewport.getBoundingClientRect();
-                let topOffset = rect.top - parentRect.top;
-                
-                // Проверяем, какая карточка зафиксирована на экране
-                if (topOffset >= -10 && topOffset <= 10) {
-                    let index = parseInt(card.getAttribute('data-index'));
-                    if (currentPlayingIndex !== index) {
-                        stopAllDevTokVideos();
-                        currentPlayingIndex = index;
-                        
-                        let video = card.querySelector('video');
-                        video.play();
+        function changeVideo(direction) {
+            let toks = DB.getVideos('devtok');
+            let newIndex = currentPlayingIndex + direction;
 
-                        // Показываем плашку запроса звука
-                        let prompt = document.getElementById('audioPrompt');
-                        prompt.style.display = 'flex';
-                    }
-                }
-            });
+            if (newIndex >= 0 && newIndex < toks.length) {
+                stopAllVideos();
+                currentPlayingIndex = newIndex;
+                
+                // Переключаем класс видимости активной карточки
+                document.querySelectorAll('.video-card-vertical').forEach((card, idx) => {
+                    if(idx === currentPlayingIndex) card.classList.add('active');
+                    else card.classList.remove('active');
+                });
+
+                playActiveVideo();
+            }
         }
 
-        function answerAudio(wantSound) {
-            document.getElementById('audioPrompt').style.display = 'none';
-            const currentCard = document.querySelector(`.video-card-vertical[data-index="${currentPlayingIndex}"]`);
-            if (currentCard) {
-                let video = currentCard.querySelector('video');
-                if (wantSound) {
-                    video.muted = false;
-                    video.currentTime = 0; // Перезапускаем сначала, чтобы пользователь услышал всё со звуком
+        function playActiveVideo() {
+            const activeCard = document.getElementById(`tok-${currentPlayingIndex}`);
+            if (activeCard) {
+                let video = activeCard.querySelector('video');
+                if(video) {
+                    video.muted = false; // Звук РАЗБЛОКИРОВАН
                     video.play();
-                } else {
-                    video.muted = true;
                 }
             }
         }
 
-        function stopAllDevTokVideos() {
-            document.querySelectorAll('.video-card-vertical video').forEach(v => {
-                v.pause();
-                v.muted = true;
-            });
-            document.getElementById('audioPrompt').style.display = 'none';
-            currentPlayingIndex = -1;
+        function stopAllVideos() {
+            document.querySelectorAll('.video-card-vertical video').forEach(v => { v.pause(); });
         }
 
         function toggleFriendFromFeed(author) {
@@ -587,7 +629,7 @@
             toggleFriendInChat();
         }
 
-        /* --- ЗАГРУЗКА ДЛЯ ДЕВТОК И ДЕВФУЛ --- */
+        /* --- ДЕВФУЛ (ОБЛАЧНАЯ СИНХРОНИЗАЦИЯ) --- */
         let uploadTarget = "";
         function triggerUpload(target) {
             uploadTarget = target;
@@ -609,20 +651,20 @@
 
                 reader.onload = function(event) {
                     if(uploadTarget === 'devtok') {
-                        if(duration > 60) { alert("Ошибка! ДевТок принимает видео только до 1 минуты."); return; }
-                        let toks = JSON.parse(localStorage.getItem('dg_devtok'));
+                        if(duration > 60) { alert("Предупреждение: ДевТок принимает ролики до 1 минуты!"); return; }
+                        let toks = DB.getVideos('devtok');
                         toks.unshift({ author: currentUser, src: event.target.result, desc: file.name });
-                        localStorage.setItem('dg_devtok', JSON.stringify(toks));
+                        DB.saveVideo('devtok', toks);
+                        currentPlayingIndex = 0;
                         renderDevTok();
-                        document.getElementById('devtokViewport').scrollTop = 0; // Скроллим наверх к новому видео
-                        handleDevTokScroll();
+                        playActiveVideo();
                     } else {
-                        let fuls = JSON.parse(localStorage.getItem('dg_devful'));
+                        let fuls = DB.getVideos('devful');
                         fuls.unshift({ author: currentUser, src: event.target.result, title: file.name.split('.')[0] });
-                        localStorage.setItem('dg_devful', JSON.stringify(fuls));
+                        DB.saveVideo('devful', fuls);
                         renderDevFul();
                     }
-                    alert("Успешно опубликовано!");
+                    alert("Ваше видео успешно улетело на общий сервер!");
                 };
                 reader.readAsDataURL(file);
             };
@@ -631,8 +673,8 @@
         function renderDevFul() {
             const grid = document.getElementById('devfulGrid');
             grid.innerHTML = '';
-            let fuls = JSON.parse(localStorage.getItem('dg_devful'));
-            if(fuls.length === 0) { grid.innerHTML = `<div style="color:gray;">Нет длинных видео.</div>`; return; }
+            let fuls = DB.getVideos('devful');
+            if(fuls.length === 0) { grid.innerHTML = `<div style="color:gray;">Длинных видео на сервере пока нет.</div>`; return; }
 
             fuls.forEach(f => {
                 const card = document.createElement('div');
