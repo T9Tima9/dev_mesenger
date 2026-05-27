@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DevGram Pro Online</title>
+    <title>DevGram Pro Online - Глобальная социальная сеть</title>
     <style>
         :root {
             --tg-theme-bg: #0e1621;
@@ -24,16 +24,20 @@
         .auth-card h2 { text-align: center; margin-bottom: 10px; }
         .auth-card input { padding: 12px; background: var(--tg-theme-bg); border: 1px solid #223242; border-radius: 6px; color: white; outline: none; }
         .auth-card button { padding: 12px; background: var(--tg-theme-button); border: none; border-radius: 6px; color: white; cursor: pointer; font-weight: bold; }
+        .auth-tabs { display: flex; gap: 10px; margin-bottom: 15px; }
+        .auth-tabs button { flex: 1; padding: 10px; background: transparent; border: 2px solid #223242; color: var(--tg-theme-hint); cursor: pointer; border-radius: 6px; }
+        .auth-tabs button.active { border-color: var(--tg-theme-button); color: var(--tg-theme-button); }
         
         .avatar-picker { display: flex; flex-direction: column; align-items: center; gap: 10px; }
         .avatar-preview { width: 80px; height: 80px; border-radius: 50%; background: #517da2; display: flex; align-items: center; justify-content: center; font-size: 30px; overflow: hidden; }
         .avatar-preview img { width: 100%; height: 100%; object-fit: cover; }
         .error-msg { color: var(--tg-theme-danger); font-size: 13px; text-align: center; display: none; }
+        .success-msg { color: #4ab54a; font-size: 13px; text-align: center; display: none; }
 
         /* Боковая панель */
         .sidebar { width: 80px; background-color: var(--tg-theme-sidebar); display: flex; flex-direction: column; align-items: center; padding: 20px 0; border-right: 1px solid #101921; gap: 20px; justify-content: space-between; }
         .sidebar-top { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
-        .logo-dev { font-size: 28px; font-weight: bold; color: var(--tg-theme-button); background: #2481cc22; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 15px; }
+        .logo-dev { font-size: 28px; font-weight: bold; color: var(--tg-theme-button); background: #2481cc22; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 15px; cursor: pointer; }
         .nav-btn { background: none; border: none; color: var(--tg-theme-hint); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 11px; width: 100%; padding: 10px 0; }
         .nav-btn.active { color: var(--tg-theme-button); background: #2481cc11; border-left: 3px solid var(--tg-theme-button); }
         .nav-btn svg { width: 26px; height: 26px; fill: currentColor; }
@@ -51,14 +55,17 @@
         .chats-container { flex: 1; overflow-y: auto; }
         .chat-item { padding: 15px; display: flex; align-items: center; gap: 12px; cursor: pointer; border-bottom: 1px solid #101921; }
         .chat-item:hover, .chat-item.active { background-color: var(--tg-theme-active); }
-        .avatar { width: 45px; height: 45px; border-radius: 50%; background: #517da2; overflow: hidden; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .avatar { width: 45px; height: 45px; border-radius: 50%; background: #517da2; overflow: hidden; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; }
         .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .chat-info { flex: 1; }
+        .chat-info h4 { margin-bottom: 3px; }
+        .chat-info p { font-size: 12px; color: var(--tg-theme-hint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
         .chat-window { flex: 1; display: flex; flex-direction: column; background: #0e1621; }
         .chat-header { padding: 15px 20px; background: var(--tg-theme-sidebar); display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #101921; }
         .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
         
-        .msg { max-width: 60%; padding: 10px 14px; border-radius: 12px; font-size: 14px; position: relative; }
+        .msg { max-width: 60%; padding: 10px 14px; border-radius: 12px; font-size: 14px; position: relative; word-wrap: break-word; }
         .msg.in { background: var(--tg-theme-sidebar); align-self: flex-start; }
         .msg.out { background: #2b5278; align-self: flex-end; }
         .msg video, .msg img, .msg audio { max-width: 240px; display: block; border-radius: 8px; margin-top: 5px; }
@@ -76,18 +83,16 @@
         #cameraPreviewContainer { display: none; position: absolute; bottom: 70px; left: 20px; width: 150px; height: 150px; border-radius: 50%; overflow: hidden; border: 3px solid var(--tg-theme-button); }
         #cameraPreviewContainer video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* === ДЕВТОК (КНОПКИ НАВИГАЦИИ) === */
+        /* === ДЕВТОК (ВЕРТИКАЛЬНОЕ ВИДЕО) === */
         .devtok-screen-wrapper { flex: 1; display: flex; justify-content: center; align-items: center; background: #000; position: relative; }
-        .devtok-viewport { width: 360px; height: 640px; background: #111; border-radius: 16px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.7); overflow: hidden; }
+        .devtok-viewport { width: 360px; height: 640px; background: #111; border-radius: 16px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.7); overflow: hidden; display: flex; align-items: center; justify-content: center; touch-action: none; }
 
-        .video-card-vertical { width: 100%; height: 100%; position: absolute; top: 0; left: 0; display: none; background: #000; }
-        .video-card-vertical.active { display: block; }
+        .video-card-vertical { width: 100%; height: 100%; position: absolute; top: 0; left: 0; display: none; background: #000; opacity: 0; transition: opacity 0.3s; }
+        .video-card-vertical.active { display: flex; opacity: 1; flex-direction: column; }
         .video-card-vertical video { width: 100%; height: 100%; object-fit: cover; }
-        .video-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px; background: linear-gradient(transparent, rgba(0,0,0,0.9)); display: flex; justify-content: space-between; align-items: flex-end; z-index: 5; }
+        .video-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px; background: linear-gradient(transparent, rgba(0,0,0,0.9)); display: flex; justify-content: space-between; align-items: flex-end; z-index: 5; width: 100%; }
         
-        .feed-arrows { position: absolute; right: -60px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 100; }
-        .arrow-btn { width: 45px; height: 45px; border-radius: 50%; background: var(--tg-theme-sidebar); border: 1px solid var(--tg-theme-button); color: white; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .arrow-btn:hover { background: var(--tg-theme-active); }
+        .devtok-hint { position: absolute; bottom: 20px; right: 20px; color: #999; font-size: 12px; text-align: right; z-index: 10; }
 
         .upload-floating-btn { position: absolute; top: 20px; right: 20px; background: var(--tg-theme-button); color: white; border: none; padding: 12px 24px; border-radius: 20px; cursor: pointer; font-weight: bold; z-index: 10; }
 
@@ -98,18 +103,24 @@
         /* ДевФул */
         .devful-container { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 25px; }
         .devful-header { display: flex; justify-content: space-between; align-items: center; }
-        .devful-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
-        .video-card-horizontal { background: var(--tg-theme-sidebar); border-radius: 12px; overflow: hidden; }
+        .devful-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .video-card-horizontal { background: var(--tg-theme-sidebar); border-radius: 12px; overflow: hidden; cursor: pointer; transition: transform 0.2s; }
+        .video-card-horizontal:hover { transform: translateY(-5px); }
         .video-card-horizontal video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; }
         .horizontal-info { padding: 15px; }
+        .horizontal-info h3 { margin-bottom: 5px; }
+        .horizontal-info p { font-size: 12px; color: var(--tg-theme-hint); }
 
         /* Кнопки Профиля / Настроек */
-        .profile-section { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px; padding-bottom: 10px; border-top: 1px solid #223242; pt: 10px; }
+        .profile-section { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px; padding-bottom: 10px; border-top: 1px solid #223242; padding-top: 10px; }
         .settings-pane { background: var(--tg-theme-sidebar); padding: 20px; border-radius: 12px; display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 400px; margin: auto; }
         .danger-btn { background: var(--tg-theme-danger) !important; }
 
         .hidden-input { display: none; }
         @keyframes blink { 50% { opacity: 0.4; } }
+        
+        .add-friend-btn { padding: 5px 12px; background: var(--tg-theme-button); border: none; color: white; border-radius: 6px; cursor: pointer; font-size: 12px; }
+    </style>
     </style>
 </head>
 <body>
@@ -117,44 +128,68 @@
     <div id="permissionModal" class="system-request-modal">
         <div class="modal-box">
             <h3>🔑 Запрос доступа к медиа</h3>
-            <p style="font-size:14px; color:var(--tg-theme-hint);">Для полноценной работы DevGram (запись кружков, аудио и работа звука в видеороликах) разрешите доступ к камере и микрофону.</p>
+            <p style="font-size:14px; color:var(--tg-theme-hint);">Для полноценной работы DevGram (запись видео, аудио и общение с друзьями) разрешите доступ к камере и микрофону.</p>
             <button onclick="requestAllPermissions()" style="padding:12px; background:var(--tg-theme-button); border:none; color:white; border-radius:6px; font-weight:bold; cursor:pointer;">Активировать медиасистему</button>
         </div>
     </div>
 
     <div id="authOverlay" style="display:none;">
-        <div class="auth-card" id="stepEmail">
+        <!-- ВХОД -->
+        <div class="auth-card" id="loginPanel" style="display:none;">
+            <h2>Вход в DevGram</h2>
+            <div class="auth-tabs" style="margin-top:20px; margin-bottom:0;">
+                <button class="active" onclick="switchAuthTab('login')">Вход</button>
+                <button onclick="switchAuthTab('register')">Регистрация</button>
+            </div>
+            <input type="text" id="loginEmail" placeholder="Юзернейм или почта">
+            <input type="password" id="loginPassword" placeholder="Пароль">
+            <button onclick="loginUser()">Войти</button>
+            <div class="error-msg" id="loginError"></div>
+        </div>
+
+        <!-- РЕГИСТРАЦИЯ ШАГ 1 -->
+        <div class="auth-card" id="registerPanel" style="display:none;">
             <h2>Регистрация</h2>
-            <p style="color:var(--tg-theme-hint); text-align:center; font-size:14px;">Введите почту</p>
-            <input type="email" id="authEmail" placeholder="name@example.com" value="test@dev.ru">
-            <button onclick="sendCodeMock()">Получить код</button>
-            <div class="error-msg" id="emailError">Введите корректную почту</div>
+            <div class="auth-tabs" style="margin-top:20px; margin-bottom:0;">
+                <button onclick="switchAuthTab('login')">Вход</button>
+                <button class="active" onclick="switchAuthTab('register')">Регистрация</button>
+            </div>
+            <p style="color:var(--tg-theme-hint); text-align:center; font-size:14px;">Шаг 1: Укажите почту</p>
+            <input type="email" id="regEmail" placeholder="example@mail.com">
+            <input type="text" id="regUsername" placeholder="@username">
+            <input type="password" id="regPassword" placeholder="Пароль (мин. 6 символов)">
+            <button onclick="startRegistration()">Отправить код на почту</button>
+            <div class="error-msg" id="regError"></div>
+            <div class="success-msg" id="regSuccess"></div>
         </div>
 
-        <div class="auth-card" id="stepCode" style="display:none;">
-            <h2>Ввод кода</h2>
-            <p style="color:var(--tg-theme-hint); text-align:center; font-size:14px;" id="codeHint"></p>
-            <input type="text" id="authCode" placeholder="Код из письма" maxlength="4">
+        <!-- РЕГИСТРАЦИЯ ШАГ 2 - КОД -->
+        <div class="auth-card" id="codePanel" style="display:none;">
+            <h2>Подтверждение почты</h2>
+            <p style="color:var(--tg-theme-hint); text-align:center; font-size:14px;" id="codeHint">Введите 6-значный код из письма</p>
+            <input type="text" id="confirmCode" placeholder="Код из письма" maxlength="6">
             <button onclick="verifyCode()">Подтвердить код</button>
-            <div class="error-msg" id="codeError">Неверный код!</div>
+            <button onclick="switchAuthTab('register')" style="background: transparent; color: var(--tg-theme-button); border: 1px solid var(--tg-theme-button);">Назад</button>
+            <div class="error-msg" id="codeError"></div>
         </div>
 
-        <div class="auth-card" id="stepProfile" style="display:none;">
-            <h2>Ваш профиль</h2>
+        <!-- РЕГИСТРАЦИЯ ШАГ 3 - ПРОФИЛЬ -->
+        <div class="auth-card" id="profilePanel" style="display:none;">
+            <h2>Завершение профиля</h2>
             <div class="avatar-picker">
                 <div class="avatar-preview" id="avatarPreview">😎</div>
                 <button onclick="document.getElementById('avatarFile').click()" style="padding:5px 10px; font-size:12px; background:#313e4b;">Выбрать фото</button>
                 <input type="file" id="avatarFile" class="hidden-input" accept="image/*">
             </div>
-            <input type="text" id="authUsername" placeholder="@username">
-            <div class="error-msg" id="usernameError">Такой юзернейм уже занят!</div>
-            <button onclick="completeRegistration()">Войти в DevGram</button>
+            <button onclick="completeRegistration()" style="margin-top:10px;">Завершить регистрацию</button>
+            <button onclick="switchAuthTab('register')" style="background: transparent; color: var(--tg-theme-button); border: 1px solid var(--tg-theme-button);">Назад</button>
+            <div class="error-msg" id="profileError"></div>
         </div>
     </div>
 
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar" style="display:none;">
         <div class="sidebar-top">
-            <div class="logo-dev">9</div>
+            <div class="logo-dev" title="DevGram">9</div>
             <button class="nav-btn active" onclick="switchTab('messenger', this)">
                 <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.54.36 2.98 1 4.28L2 22l5.72-1c1.3.64 2.74 1 4.28 1 5.52 0 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/></svg>
                 Чаты
@@ -177,11 +212,12 @@
         </div>
     </div>
 
-    <div class="main-content">
+    <div class="main-content" id="mainContent" style="display:none;">
+        <!-- МЕССЕНДЖЕР -->
         <div id="messenger" class="screen active">
             <div class="chats-list">
                 <div class="search-bar">
-                    <input type="text" id="userSearchInput" placeholder="Поиск по @username...">
+                    <input type="text" id="userSearchInput" placeholder="Поиск @username...">
                     <button onclick="searchUser()">Найти</button>
                 </div>
                 <div class="chats-container" id="chatsContainer"></div>
@@ -191,7 +227,10 @@
                 <div class="chat-header">
                     <div style="display:flex; align-items:center; gap:10px;">
                         <div class="avatar" id="activeChatAvatar"></div>
-                        <h4 id="activeChatName">@username</h4>
+                        <div>
+                            <h4 id="activeChatName">@username</h4>
+                            <p style="font-size:11px; color:var(--tg-theme-hint);" id="activeChatEmail"></p>
+                        </div>
                     </div>
                     <button class="add-friend-btn" id="chatFriendBtn" onclick="toggleFriendInChat()">В друзья</button>
                 </div>
@@ -214,17 +253,16 @@
             </div>
         </div>
 
+        <!-- ДЕВТОК -->
         <div id="devtok" class="screen">
-            <button class="upload-floating-btn" onclick="triggerUpload('devtok')">+ Создать ДевТок</button>
+            <button class="upload-floating-btn" onclick="triggerUpload('devtok')">+ ДевТок</button>
             <div class="devtok-screen-wrapper">
                 <div class="devtok-viewport" id="devtokViewport"></div>
-                <div class="feed-arrows">
-                    <button class="arrow-btn" onclick="changeVideo(-1)">▲</button>
-                    <button class="arrow-btn" onclick="changeVideo(1)">▼</button>
-                </div>
+                <div class="devtok-hint">Свайп вверх/вниз для переключения</div>
             </div>
         </div>
 
+        <!-- ДЕВФУЛ -->
         <div id="devful" class="screen">
             <div class="devful-container">
                 <div class="devful-header">
@@ -235,13 +273,17 @@
             </div>
         </div>
 
+        <!-- ПРОФИЛЬ -->
         <div id="settings" class="screen" style="display:none; justify-content:center; align-items:center;">
             <div class="settings-pane">
                 <h2 style="text-align:center;" id="settingsTitle">Мой Профиль</h2>
+                <div style="text-align:center; margin:20px 0;">
+                    <div class="avatar" style="width:80px; height:80px; margin:0 auto;" id="profileAvatar">?</div>
+                </div>
                 <p style="text-align:center; color:var(--tg-theme-hint);" id="settingsSub"></p>
                 
                 <button onclick="logOutAccount()" style="margin-top:10px;">Выйти из аккаунта</button>
-                <button onclick="deleteAccountPermanently()" class="danger-btn">❌ Полностью удалить аккаунт</button>
+                <button onclick="deleteAccountPermanently()" class="danger-btn">❌ Удалить аккаунт</button>
             </div>
         </div>
     </div>
@@ -250,245 +292,407 @@
     <input type="file" id="contentVideoLoader" class="hidden-input" accept="video/*">
 
     <script>
-        let globalAudioCtx = null;
-        let currentUser = localStorage.getItem('dg_current_user') || null;
-        let generatedCode = null;
-        let tempEmail = "";
-        let tempAvatarBase64 = "";
-        let activeChatUser = null;
-
-        let mediaRecorder = null;
-        let audioChunks = [];
-        let videoChunks = [];
-        let isRecordingVoice = false;
-        let isRecordingCircle = false;
-        let circleStream = null;
-        let currentPlayingIndex = 0;
-
-        // Временное хранилище Blob-ссылок для видео текущей сессии
-        let videoBlobsStorage = {};
-
-        // Список дефолтных видео (если база пустая)
-        const defaultVideos = [
-            { id: "v1", author: "@code_boss", src: "https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-light-in-a-futuristic-tunnel-41838-large.mp4", desc: "Пишу код в неоновом туннеле" },
-            { id: "v2", author: "@admin", src: "https://assets.mixkit.co/videos/preview/mixkit-tunnel-of-futuristic-blue-lights-42205-large.mp4", desc: "ДевТок теперь без багов!" }
-        ];
-
-        async function requestAllPermissions() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
-                stream.getTracks().forEach(t => t.stop());
-                globalAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                document.getElementById('permissionModal').style.display = 'none';
-                if (currentUser) initApp(); else document.getElementById('authOverlay').style.display = 'flex';
-            } catch (err) {
-                document.getElementById('permissionModal').style.display = 'none';
-                if (currentUser) initApp(); else document.getElementById('authOverlay').style.display = 'flex';
-            }
-        }
-
-        // ОБЛАЧНЫЙ СЕРВЕР (Имитация глобальной синхронизации между вкладками)
+        // ===== ГЛОБАЛЬНАЯ БД =====
         const CloudDB = {
-            getUsers: function() {
-                if(!localStorage.getItem('dg_global_users')) {
+            initDB: function() {
+                // Инициализируем глобальный реестр пользователей
+                if (!localStorage.getItem('dg_global_users')) {
                     localStorage.setItem('dg_global_users', JSON.stringify({
-                        "@admin": { username: "@admin", avatar: "", email: "admin@dev.ru", friends: [], chats: {} },
-                        "@code_boss": { username: "@code_boss", avatar: "", email: "boss@dev.ru", friends: [], chats: {} }
+                        "@admin": { 
+                            username: "@admin", 
+                            email: "admin@example.com", 
+                            password: "admin123",
+                            avatar: "", 
+                            friends: [], 
+                            chats: {},
+                            deleted: false
+                        },
+                        "@boss": { 
+                            username: "@boss", 
+                            email: "boss@example.com", 
+                            password: "boss123",
+                            avatar: "", 
+                            friends: [], 
+                            chats: {},
+                            deleted: false
+                        }
                     }));
                 }
-                return JSON.parse(localStorage.getItem('dg_global_users'));
+                // Инициализируем видео
+                if (!localStorage.getItem('dg_global_devtok')) {
+                    localStorage.setItem('dg_global_devtok', JSON.stringify([
+                        { id: "v1", author: "@admin", src: "https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-light-in-a-futuristic-tunnel-41838-large.mp4", desc: "Первое видео в сети" },
+                        { id: "v2", author: "@boss", src: "https://assets.mixkit.co/videos/preview/mixkit-tunnel-of-futuristic-blue-lights-42205-large.mp4", desc: "Добро пожаловать в DevGram!" }
+                    ]));
+                }
+                if (!localStorage.getItem('dg_global_devful')) {
+                    localStorage.setItem('dg_global_devful', JSON.stringify([]));
+                }
+            },
+            getUsers: function() {
+                return JSON.parse(localStorage.getItem('dg_global_users') || '{}');
             },
             saveUsers: function(users) {
                 localStorage.setItem('dg_global_users', JSON.stringify(users));
             },
+            getUser: function(username) {
+                return this.getUsers()[username] || null;
+            },
+            getUserByEmail: function(email) {
+                let users = this.getUsers();
+                for (let u in users) {
+                    if (users[u].email.toLowerCase() === email.toLowerCase()) {
+                        return users[u];
+                    }
+                }
+                return null;
+            },
             getVideos: function(type) {
                 let key = 'dg_global_' + type;
-                if(!localStorage.getItem(key)) {
-                    localStorage.setItem(key, JSON.stringify(type === 'devtok' ? defaultVideos : []));
-                }
-                return JSON.parse(localStorage.getItem(key));
+                return JSON.parse(localStorage.getItem(key) || '[]');
             },
             saveVideoList: function(type, list) {
                 localStorage.setItem('dg_global_' + type, JSON.stringify(list));
             }
         };
 
-        function sendCodeMock() {
-            const email = document.getElementById('authEmail').value;
-            if(!email.includes('@')) { document.getElementById('emailError').style.display = 'block'; return; }
-            tempEmail = email;
-            generatedCode = Math.floor(1000 + Math.random() * 9000).toString();
-            alert(`[DevGram Server]\nКод подтверждения регистрации: ${generatedCode}`);
-            document.getElementById('stepEmail').style.display = 'none';
-            document.getElementById('stepCode').style.display = 'block';
-            document.getElementById('codeHint').innerText = `Код выслан на ${email}`;
+        // ===== ПЕРЕМЕННЫЕ СОСТОЯНИЯ =====
+        let currentUser = localStorage.getItem('dg_current_user') || null;
+        let activeChatUser = null;
+        let tempRegData = {};
+        let generatedCode = null;
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let videoChunks = [];
+        let isRecordingVoice = false;
+        let isRecordingCircle = false;
+        let circleStream = null;
+        let currentDevTokIndex = 0;
+        let videoBlobsStorage = {};
+        let lastTouchY = 0;
+
+        // ===== ИНИЦИАЛИЗАЦИЯ =====
+        CloudDB.initDB();
+
+        window.onload = function() {
+            if (currentUser && !CloudDB.getUser(currentUser)?.deleted) {
+                initApp();
+            } else {
+                currentUser = null;
+                localStorage.removeItem('dg_current_user');
+                showAuthScreen();
+            }
+            requestAllPermissions();
+        };
+
+        async function requestAllPermissions() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+                stream.getTracks().forEach(t => t.stop());
+                document.getElementById('permissionModal').style.display = 'none';
+            } catch (err) {
+                // Сокрываем модаль даже если нет доступа
+                setTimeout(() => {
+                    document.getElementById('permissionModal').style.display = 'none';
+                }, 1500);
+            }
+        }
+
+        // ===== АУТЕНТИФИКАЦИЯ =====
+        function showAuthScreen() {
+            document.getElementById('authOverlay').style.display = 'flex';
+            document.getElementById('sidebar').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'none';
+            switchAuthTab('login');
+        }
+
+        function switchAuthTab(tab) {
+            document.getElementById('loginPanel').style.display = 'none';
+            document.getElementById('registerPanel').style.display = 'none';
+            document.getElementById('codePanel').style.display = 'none';
+            document.getElementById('profilePanel').style.display = 'none';
+
+            document.querySelectorAll('.auth-tabs button').forEach(b => b.classList.remove('active'));
+
+            if (tab === 'login') {
+                document.getElementById('loginPanel').style.display = 'flex';
+                document.querySelectorAll('#loginPanel .auth-tabs button')[0].classList.add('active');
+                clearElement('loginError');
+            } else if (tab === 'register') {
+                document.getElementById('registerPanel').style.display = 'flex';
+                document.querySelectorAll('#registerPanel .auth-tabs button')[1].classList.add('active');
+                clearElement('regError');
+                clearElement('regSuccess');
+            }
+        }
+
+        function loginUser() {
+            const input = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            let user = null;
+
+            // Ищем по юзернейму или почте
+            if (input.startsWith('@')) {
+                user = CloudDB.getUser(input);
+            } else {
+                user = CloudDB.getUserByEmail(input);
+            }
+
+            if (!user) {
+                showError('loginError', 'Пользователь не найден');
+                return;
+            }
+
+            if (user.deleted) {
+                showError('loginError', 'Этот аккаунт был удален');
+                return;
+            }
+
+            if (user.password !== password) {
+                showError('loginError', 'Неверный пароль');
+                return;
+            }
+
+            currentUser = user.username;
+            localStorage.setItem('dg_current_user', currentUser);
+            document.getElementById('authOverlay').style.display = 'none';
+            initApp();
+        }
+
+        function startRegistration() {
+            const email = document.getElementById('regEmail').value.trim();
+            const username = document.getElementById('regUsername').value.trim().toLowerCase();
+            const password = document.getElementById('regPassword').value;
+
+            clearElement('regError');
+            clearElement('regSuccess');
+
+            // Валидация
+            if (!email.includes('@')) {
+                showError('regError', 'Введите корректный email');
+                return;
+            }
+
+            if (!username.startsWith('@')) {
+                showError('regError', 'Юзернейм должен начинаться с @');
+                return;
+            }
+
+            if (username.length < 3) {
+                showError('regError', 'Юзернейм должен быть не менее 3 символов');
+                return;
+            }
+
+            if (password.length < 6) {
+                showError('regError', 'Пароль должен быть не менее 6 символов');
+                return;
+            }
+
+            let users = CloudDB.getUsers();
+            if (users[username]) {
+                showError('regError', 'Этот @username уже занят');
+                return;
+            }
+
+            if (CloudDB.getUserByEmail(email)) {
+                showError('regError', 'Этот email уже зарегистрирован');
+                return;
+            }
+
+            // Сохраняем временные данные
+            tempRegData = { email, username, password };
+
+            // Генерируем код подтверждения
+            generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+            // Имитируем отправку на почту
+            alert(`[DevGram Почта]\n\nКод подтверждения: ${generatedCode}\n\nОтправлен на ${email}`);
+
+            document.getElementById('codeHint').textContent = `Код выслан на ${email}`;
+            document.getElementById('confirmCode').value = '';
+            document.getElementById('codePanel').style.display = 'flex';
+            document.getElementById('registerPanel').style.display = 'none';
         }
 
         function verifyCode() {
-            if(document.getElementById('authCode').value === generatedCode) {
-                document.getElementById('stepCode').style.display = 'none';
-                document.getElementById('stepProfile').style.display = 'block';
-            } else { document.getElementById('codeError').style.display = 'block'; }
+            const code = document.getElementById('confirmCode').value;
+            clearElement('codeError');
+
+            if (code !== generatedCode) {
+                showError('codeError', 'Неверный код');
+                return;
+            }
+
+            // Переходим на следующий этап
+            document.getElementById('codePanel').style.display = 'none';
+            document.getElementById('profilePanel').style.display = 'flex';
+            document.getElementById('avatarPreview').innerHTML = '😎';
         }
 
-        document.getElementById('avatarFile').addEventListener('change', function(e) {
+        document.getElementById('avatarFile')?.addEventListener('change', function(e) {
             const file = e.target.files[0];
-            if(file) {
+            if (file) {
                 const reader = new FileReader();
                 reader.onload = function(event) {
-                    tempAvatarBase64 = event.target.result;
-                    document.getElementById('avatarPreview').innerHTML = `<img src="${tempAvatarBase64}">`;
+                    tempRegData.avatar = event.target.result;
+                    document.getElementById('avatarPreview').innerHTML = `<img src="${event.target.result}">`;
                 };
                 reader.readAsDataURL(file);
             }
         });
 
         function completeRegistration() {
-            let username = document.getElementById('authUsername').value.trim().toLowerCase();
-            if(!username.startsWith('@')) username = '@' + username;
-            const usernameRegex = /^@[a-zA-Z0-9_]+$/;
-            
             let users = CloudDB.getUsers();
 
-            if(!usernameRegex.test(username) || username.length < 3) {
-                showUsernameError("Ник должен содержать буквы, цифры и '_'"); return;
-            }
-            
-            // ЕСЛИ АККАУНТ БЫЛ УДАЛЕН — ЭТА ПРОВЕРКА ПРОЙДЕТ УСПЕШНО, НИК СВОБОДЕН!
-            if(users[username]) { 
-                showUsernameError("Этот @username уже кем-то занят!"); 
-                return; 
-            }
+            users[tempRegData.username] = {
+                username: tempRegData.username,
+                email: tempRegData.email,
+                password: tempRegData.password,
+                avatar: tempRegData.avatar || '',
+                friends: [],
+                chats: {},
+                deleted: false
+            };
 
-            users[username] = { username: username, avatar: tempAvatarBase64, email: tempEmail, friends: [], chats: {} };
             CloudDB.saveUsers(users);
-            
-            localStorage.setItem('dg_current_user', username);
-            currentUser = username;
+
+            currentUser = tempRegData.username;
+            localStorage.setItem('dg_current_user', currentUser);
+
             document.getElementById('authOverlay').style.display = 'none';
             initApp();
         }
 
-        function showUsernameError(text) {
-            const err = document.getElementById('usernameError');
-            err.innerText = text; err.style.display = 'block';
-        }
-
+        // ===== ОСНОВНОЕ ПРИЛОЖЕНИЕ =====
         function initApp() {
-            let users = CloudDB.getUsers();
-            let me = users[currentUser];
-            
-            if(me && me.avatar) {
-                document.getElementById('sidebarAvatar').innerHTML = `<img src="${me.avatar}">`;
+            document.getElementById('authOverlay').style.display = 'none';
+            document.getElementById('sidebar').style.display = 'flex';
+            document.getElementById('mainContent').style.display = 'flex';
+
+            let user = CloudDB.getUser(currentUser);
+            if (!user) return;
+
+            // Обновляем аватар в сайдбаре
+            const sidebarAvatar = document.getElementById('sidebarAvatar');
+            if (user.avatar) {
+                sidebarAvatar.innerHTML = `<img src="${user.avatar}">`;
             } else {
-                document.getElementById('sidebarAvatar').innerText = currentUser.substring(1,3).toUpperCase();
+                sidebarAvatar.textContent = user.username.substring(1, 3).toUpperCase();
             }
 
-            document.getElementById('settingsTitle').innerText = me.username;
-            document.getElementById('settingsSub').innerText = `Почта: ${me.email}`;
+            // Обновляем профиль
+            const profileAvatar = document.getElementById('profileAvatar');
+            if (user.avatar) {
+                profileAvatar.innerHTML = `<img src="${user.avatar}">`;
+            } else {
+                profileAvatar.textContent = user.username.substring(1, 3).toUpperCase();
+            }
+
+            document.getElementById('settingsTitle').textContent = user.username;
+            document.getElementById('settingsSub').textContent = `Почта: ${user.email}`;
 
             renderChatsList();
             renderDevTok();
             renderDevFul();
             setupMediaHandlers();
+            setupDevTokSwipe();
         }
 
         function switchTab(screenId, button) {
-            document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            
-            const targetScreen = document.getElementById(screenId);
-            if(screenId === 'settings') targetScreen.style.display = 'flex';
-            else targetScreen.style.display = 'flex';
 
+            document.getElementById(screenId).classList.add('active');
             button.classList.add('active');
 
-            if(screenId === 'devtok') {
-                playActiveVideo();
+            if (screenId === 'devtok') {
+                playActiveDevTokVideo();
             } else {
                 stopAllVideos();
             }
         }
 
-        /* --- ВЫХОД И УДАЛЕНИЕ АККАУНТА --- */
-        function logOutAccount() {
-            if(confirm("Вы уверены, что хотите выйти из профиля?")) {
-                localStorage.removeItem('dg_current_user');
-                currentUser = null;
-                location.reload();
-            }
-        }
-
-        function deleteAccountPermanently() {
-            if(confirm("КРИТИЧЕСКОЕ ДЕЙСТВИЕ!\nВы уверены, что хотите НАВСЕГДА удалить свой аккаунт? Ваш ник мгновенно освободится для других.")) {
-                let users = CloudDB.getUsers();
-                
-                // Удаляем пользователя из общей базы
-                delete users[currentUser];
-                CloudDB.saveUsers(users);
-                
-                // Чистим локальные данные
-                localStorage.removeItem('dg_current_user');
-                currentUser = null;
-                
-                alert("Ваш аккаунт успешно ликвидирован! Юзернейм теперь свободен.");
-                location.reload();
-            }
-        }
-
-        /* --- ПОИСК И МЕССЕНДЖЕР --- */
+        // ===== МЕССЕНДЖЕР =====
         function searchUser() {
             const searchVal = document.getElementById('userSearchInput').value.trim().toLowerCase();
-            let formattedSearch = searchVal.startsWith('@') ? searchVal : '@' + searchVal;
-            let users = CloudDB.getUsers();
+            let username = searchVal.startsWith('@') ? searchVal : '@' + searchVal;
 
-            if(formattedSearch === currentUser) { alert("Это вы!"); return; }
-            if(users[formattedSearch]) { openChat(formattedSearch); } 
-            else { alert("Пользователь не зарегистрирован в сети!"); }
+            if (username === currentUser) {
+                alert('Это вы сами!');
+                return;
+            }
+
+            let user = CloudDB.getUser(username);
+            if (!user || user.deleted) {
+                alert('Пользователь не найден');
+                return;
+            }
+
+            openChat(username);
         }
 
         function openChat(username) {
+            let user = CloudDB.getUser(username);
+            if (!user || user.deleted) return;
+
             activeChatUser = username;
             document.getElementById('noChatPlaceholder').style.display = 'none';
             document.getElementById('chatWindow').style.display = 'flex';
-            document.getElementById('activeChatName').innerText = username;
-            
-            let users = CloudDB.getUsers();
-            let targetUser = users[username];
+            document.getElementById('activeChatName').textContent = username;
+            document.getElementById('activeChatEmail').textContent = user.email;
 
             const avatarDiv = document.getElementById('activeChatAvatar');
-            if(targetUser.avatar) avatarDiv.innerHTML = `<img src="${targetUser.avatar}">`;
-            else avatarDiv.innerHTML = username.substring(1,3).toUpperCase();
+            if (user.avatar) {
+                avatarDiv.innerHTML = `<img src="${user.avatar}">`;
+            } else {
+                avatarDiv.textContent = username.substring(1, 3).toUpperCase();
+            }
 
             const fBtn = document.getElementById('chatFriendBtn');
-            if(users[currentUser].friends && users[currentUser].friends.includes(username)) {
-                fBtn.innerText = "В друзьях"; fBtn.style.background = "#4ab54a";
+            let me = CloudDB.getUser(currentUser);
+            if (me.friends && me.friends.includes(username)) {
+                fBtn.textContent = 'В друзьях';
+                fBtn.style.background = '#4ab54a';
             } else {
-                fBtn.innerText = "В друзья"; fBtn.style.background = "var(--tg-theme-button)";
+                fBtn.textContent = 'В друзья';
+                fBtn.style.background = 'var(--tg-theme-button)';
             }
+
             renderMessages();
             renderChatsList();
+            document.getElementById('messageInput').focus();
         }
 
         function toggleFriendInChat() {
+            let me = CloudDB.getUser(currentUser);
+            if (!me.friends) me.friends = [];
+
+            if (me.friends.includes(activeChatUser)) {
+                me.friends = me.friends.filter(f => f !== activeChatUser);
+            } else {
+                me.friends.push(activeChatUser);
+            }
+
             let users = CloudDB.getUsers();
-            let me = users[currentUser];
-            if(!me.friends) me.friends = [];
-            if(me.friends.includes(activeChatUser)) { me.friends = me.friends.filter(f => f !== activeChatUser); } 
-            else { me.friends.push(activeChatUser); }
+            users[currentUser] = me;
             CloudDB.saveUsers(users);
+
             openChat(activeChatUser);
         }
 
         function saveMessage(msgObj) {
             let users = CloudDB.getUsers();
-            if(!users[currentUser].chats) users[currentUser].chats = {};
-            if(!users[activeChatUser].chats) users[activeChatUser].chats = {};
-            if(!users[currentUser].chats[activeChatUser]) users[currentUser].chats[activeChatUser] = [];
-            if(!users[activeChatUser].chats[currentUser]) users[activeChatUser].chats[currentUser] = [];
+            let me = users[currentUser];
+            let them = users[activeChatUser];
 
-            users[currentUser].chats[activeChatUser].push(msgObj);
-            users[activeChatUser].chats[currentUser].push(msgObj);
+            if (!me.chats) me.chats = {};
+            if (!them.chats) them.chats = {};
+            if (!me.chats[activeChatUser]) me.chats[activeChatUser] = [];
+            if (!them.chats[currentUser]) them.chats[currentUser] = [];
+
+            me.chats[activeChatUser].push(msgObj);
+            them.chats[currentUser].push(msgObj);
+
             CloudDB.saveUsers(users);
             renderMessages();
             renderChatsList();
@@ -497,37 +701,57 @@
         function renderMessages() {
             const container = document.getElementById('chatMessages');
             container.innerHTML = '';
-            let users = CloudDB.getUsers();
-            let history = users[currentUser].chats?.[activeChatUser] || [];
+
+            let me = CloudDB.getUser(currentUser);
+            let history = me.chats?.[activeChatUser] || [];
 
             history.forEach(m => {
                 const div = document.createElement('div');
                 div.className = `msg ${m.sender === currentUser ? 'out' : 'in'}`;
-                if(m.type === 'text') div.innerText = m.content;
-                if(m.type === 'image') div.innerHTML = `<img src="${m.content}">`;
-                if(m.type === 'video') div.innerHTML = `<video src="${m.content}" controls></video>`;
-                if(m.type === 'voice') div.innerHTML = `<audio src="${m.content}" controls></audio>`;
-                if(m.type === 'circle') div.innerHTML = `<video class="circle-video" src="${m.content}" autoplay loop controls></video>`;
+
+                if (m.type === 'text') {
+                    div.textContent = m.content;
+                } else if (m.type === 'image') {
+                    div.innerHTML = `<img src="${m.content}">`;
+                } else if (m.type === 'video') {
+                    div.innerHTML = `<video src="${m.content}" controls style="max-width:240px;"></video>`;
+                } else if (m.type === 'voice') {
+                    div.innerHTML = `<audio src="${m.content}" controls></audio>`;
+                } else if (m.type === 'circle') {
+                    div.innerHTML = `<video class="circle-video" src="${m.content}" autoplay loop controls></video>`;
+                }
+
                 container.appendChild(div);
             });
+
             container.scrollTop = container.scrollHeight;
         }
 
         function renderChatsList() {
             const container = document.getElementById('chatsContainer');
             container.innerHTML = '';
-            let users = CloudDB.getUsers();
-            let myChats = users[currentUser].chats || {};
+
+            let me = CloudDB.getUser(currentUser);
+            let myChats = me.chats || {};
 
             Object.keys(myChats).forEach(username => {
+                let them = CloudDB.getUser(username);
+                if (!them || them.deleted) return;
+
                 const item = document.createElement('div');
                 item.className = `chat-item ${activeChatUser === username ? 'active' : ''}`;
                 item.onclick = () => openChat(username);
-                let uData = users[username] || { avatar: "" };
+
                 let lastMsg = myChats[username][myChats[username].length - 1];
+                let msgPreview = lastMsg.type === 'text' ? lastMsg.content : `[${lastMsg.type}]`;
+                if (msgPreview.length > 30) msgPreview = msgPreview.substring(0, 30) + '...';
+
                 item.innerHTML = `
-                    <div class="avatar">${uData.avatar ? `<img src="${uData.avatar}">` : username.substring(1,3).toUpperCase()}</div>
-                    <div class="chat-info"><h4>${username}</h4><p>${lastMsg.type === 'text' ? lastMsg.content : '[Медиа]'}</p></div>
+                    <div class="avatar">${them.avatar ? `<img src="${them.avatar}">` : username.substring(1, 3).toUpperCase()}</div>
+                    <div class="chat-info">
+                        <h4>${username}</h4>
+                        <p>${msgPreview}</p>
+                    </div>
                 `;
                 container.appendChild(item);
             });
@@ -535,8 +759,14 @@
 
         function sendTextMessage() {
             const input = document.getElementById('messageInput');
-            if(!input.value.trim() || !activeChatUser) return;
-            saveMessage({ sender: currentUser, type: 'text', content: input.value });
+            if (!input.value.trim() || !activeChatUser) return;
+
+            saveMessage({
+                sender: currentUser,
+                type: 'text',
+                content: input.value
+            });
+
             input.value = '';
         }
 
@@ -545,10 +775,14 @@
             loader.accept = type === 'image' ? 'image/*' : 'video/*';
             loader.onchange = function(e) {
                 const file = e.target.files[0];
-                if(file) {
+                if (file) {
                     const reader = new FileReader();
                     reader.onload = function(event) {
-                        saveMessage({ sender: currentUser, type: type, content: event.target.result });
+                        saveMessage({
+                            sender: currentUser,
+                            type: type,
+                            content: event.target.result
+                        });
                     };
                     reader.readAsDataURL(file);
                 }
@@ -570,68 +804,91 @@
                         mediaRecorder.onstop = () => {
                             const blob = new Blob(audioChunks, { type: 'audio/ogg;' });
                             const reader = new FileReader();
-                            reader.onloadend = () => { saveMessage({ sender: currentUser, type: 'voice', content: reader.result }); };
+                            reader.onloadend = () => {
+                                saveMessage({
+                                    sender: currentUser,
+                                    type: 'voice',
+                                    content: reader.result
+                                });
+                            };
                             reader.readAsDataURL(blob);
                             stream.getTracks().forEach(t => t.stop());
                         };
                         mediaRecorder.start();
-                        isRecordingVoice = true; voiceBtn.classList.add('recording');
-                    } catch(e) { alert("Микрофон недоступен."); }
-                } else { mediaRecorder.stop(); isRecordingVoice = false; voiceBtn.classList.remove('recording'); }
+                        isRecordingVoice = true;
+                        voiceBtn.classList.add('recording');
+                    } catch (e) {
+                        alert('Микрофон недоступен');
+                    }
+                } else {
+                    mediaRecorder.stop();
+                    isRecordingVoice = false;
+                    voiceBtn.classList.remove('recording');
+                }
             };
 
             circleBtn.onclick = async () => {
-                if(!isRecordingCircle) {
+                if (!isRecordingCircle) {
                     try {
                         circleStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                         document.getElementById('cameraPreviewContainer').style.display = 'block';
                         document.getElementById('cameraPreview').srcObject = circleStream;
+
                         mediaRecorder = new MediaRecorder(circleStream);
                         videoChunks = [];
                         mediaRecorder.ondataavailable = e => videoChunks.push(e.data);
                         mediaRecorder.onstop = () => {
                             const blob = new Blob(videoChunks, { type: 'video/mp4' });
                             const reader = new FileReader();
-                            reader.onloadend = () => { saveMessage({ sender: currentUser, type: 'circle', content: reader.result }); };
+                            reader.onloadend = () => {
+                                saveMessage({
+                                    sender: currentUser,
+                                    type: 'circle',
+                                    content: reader.result
+                                });
+                            };
                             reader.readAsDataURL(blob);
                             circleStream.getTracks().forEach(t => t.stop());
                             document.getElementById('cameraPreviewContainer').style.display = 'none';
                         };
                         mediaRecorder.start();
-                        isRecordingCircle = true; circleBtn.classList.add('recording');
-                    } catch(e) { alert("Камера недоступна."); }
-                } else { mediaRecorder.stop(); isRecordingCircle = false; circleBtn.classList.remove('recording'); }
+                        isRecordingCircle = true;
+                        circleBtn.classList.add('recording');
+                    } catch (e) {
+                        alert('Камера недоступна');
+                    }
+                } else {
+                    mediaRecorder.stop();
+                    isRecordingCircle = false;
+                    circleBtn.classList.remove('recording');
+                }
             };
         }
 
-        /* --- ИСПРАВЛЕННЫЙ ПЛЕЕР ДЕВТОК (РАБОТАЕТ МГНОВЕННО) --- */
+        // ===== ДЕВТОК =====
         function renderDevTok() {
             const viewport = document.getElementById('devtokViewport');
             viewport.innerHTML = '';
-            let toks = CloudDB.getVideos('devtok');
-            let users = CloudDB.getUsers();
 
-            if(toks.length === 0) {
-                viewport.innerHTML = `<div style="text-align:center; padding:50px; color:gray;">ДевТок лента пуста</div>`;
+            let toks = CloudDB.getVideos('devtok');
+            if (toks.length === 0) {
+                viewport.innerHTML = '<div style="color: #666; font-size: 14px;">Видео еще не загружены</div>';
                 return;
             }
 
             toks.forEach((t, idx) => {
-                let isFriend = users[currentUser]?.friends?.includes(t.author);
                 const card = document.createElement('div');
-                card.className = `video-card-vertical ${idx === currentPlayingIndex ? 'active' : ''}`;
-                card.setAttribute('id', `tok-${idx}`);
-                
-                // Проверяем, откуда брать видео: из Blob-памяти текущей сессии или по внешней веб-ссылке
-                let finalSrc = videoBlobsStorage[t.id] ? videoBlobsStorage[t.id] : t.src;
+                card.className = `video-card-vertical ${idx === currentDevTokIndex ? 'active' : ''}`;
+                card.setAttribute('data-index', idx);
+
+                let finalSrc = videoBlobsStorage[t.id] || t.src;
 
                 card.innerHTML = `
-                    <video src="${finalSrc}" loop playsinline></video>
+                    <video src="${finalSrc}" autoplay muted playsinline></video>
                     <div class="video-overlay">
-                        <div class="author-info">
-                            <h3>${t.author}</h3>
-                            <p>${t.desc}</p>
-                            ${t.author !== currentUser ? `<button class="add-friend-btn" onclick="toggleFriendFromFeed('${t.author}')">${isFriend ? 'В друзьях' : 'В друзья'}</button>` : ''}
+                        <div>
+                            <h3 style="margin:0; font-size:16px;">${t.author}</h3>
+                            <p style="margin:5px 0 0 0; font-size:13px; color:#ddd;">${t.desc || 'Видео'}</p>
                         </div>
                     </div>
                 `;
@@ -639,47 +896,99 @@
             });
         }
 
-        function changeVideo(direction) {
-            let toks = CloudDB.getVideos('devtok');
-            let newIndex = currentPlayingIndex + direction;
-
-            if (newIndex >= 0 && newIndex < toks.length) {
-                stopAllVideos();
-                currentPlayingIndex = newIndex;
-                
-                document.querySelectorAll('.video-card-vertical').forEach((card, idx) => {
-                    if(idx === currentPlayingIndex) card.classList.add('active');
-                    else card.classList.remove('active');
-                });
-
-                playActiveVideo();
-            }
-        }
-
-        function playActiveVideo() {
-            const activeCard = document.getElementById(`tok-${currentPlayingIndex}`);
-            if (activeCard) {
-                let video = activeCard.querySelector('video');
-                if(video) {
-                    video.muted = false; // Звук полностью включен благодаря клику по кнопкам стрелок!
-                    video.play().catch(e => console.log("Автоплей заблокирован системой"));
+        function playActiveDevTokVideo() {
+            const cards = document.querySelectorAll('.video-card-vertical');
+            cards.forEach((card, idx) => {
+                const video = card.querySelector('video');
+                if (idx === currentDevTokIndex) {
+                    card.classList.add('active');
+                    if (video) {
+                        video.muted = false;
+                        video.play().catch(() => {});
+                    }
+                } else {
+                    card.classList.remove('active');
+                    if (video) video.pause();
                 }
-            }
+            });
         }
 
         function stopAllVideos() {
-            document.querySelectorAll('.video-card-vertical video').forEach(v => { v.pause(); });
-            document.querySelectorAll('.video-card-horizontal video').forEach(v => { v.pause(); });
+            document.querySelectorAll('video').forEach(v => v.pause());
         }
 
-        function toggleFriendFromFeed(author) {
-            activeChatUser = author;
-            toggleFriendInChat();
-            renderDevTok();
+        function setupDevTokSwipe() {
+            const viewport = document.getElementById('devtokViewport');
+            if (!viewport) return;
+
+            viewport.addEventListener('touchstart', (e) => {
+                lastTouchY = e.touches[0].clientY;
+            });
+
+            viewport.addEventListener('touchend', (e) => {
+                const currentY = e.changedTouches[0].clientY;
+                const diff = lastTouchY - currentY;
+                const toks = CloudDB.getVideos('devtok');
+
+                if (Math.abs(diff) > 50) {
+                    if (diff > 0) {
+                        // Свайп вверх = новое видео (следующее)
+                        currentDevTokIndex = (currentDevTokIndex + 1) % toks.length;
+                    } else {
+                        // Свайп вниз = старое видео (предыдущее)
+                        currentDevTokIndex = (currentDevTokIndex - 1 + toks.length) % toks.length;
+                    }
+                    renderDevTok();
+                    playActiveDevTokVideo();
+                }
+            });
+
+            // Также поддерживаем колесо мыши
+            viewport.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const toks = CloudDB.getVideos('devtok');
+                
+                if (e.deltaY > 0) {
+                    // Вниз на колесе = новое видео
+                    currentDevTokIndex = (currentDevTokIndex + 1) % toks.length;
+                } else {
+                    // Вверх на колесе = старое видео
+                    currentDevTokIndex = (currentDevTokIndex - 1 + toks.length) % toks.length;
+                }
+                renderDevTok();
+                playActiveDevTokVideo();
+            }, { passive: false });
         }
 
-        /* --- НОВЫЙ ДВИЖОК ЗАГРУЗКИ ВИДЕО (ЧЕРЕЗ BLOB) --- */
+        // ===== ДЕВФУЛ =====
+        function renderDevFul() {
+            const grid = document.getElementById('devfulGrid');
+            grid.innerHTML = '';
+
+            let fuls = CloudDB.getVideos('devful');
+            if (fuls.length === 0) {
+                grid.innerHTML = '<div style="color: #666; padding: 20px;">Видео еще не загружены</div>';
+                return;
+            }
+
+            fuls.forEach(f => {
+                let finalSrc = videoBlobsStorage[f.id] || f.src;
+                const card = document.createElement('div');
+                card.className = 'video-card-horizontal';
+                card.innerHTML = `
+                    <video src="${finalSrc}" controls style="cursor: pointer;"></video>
+                    <div class="horizontal-info">
+                        <h3>${f.title}</h3>
+                        <p>📌 ${f.author}</p>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // ===== ЗАГРУЗКА ВИДЕО =====
         let uploadTarget = "";
+
         function triggerUpload(target) {
             uploadTarget = target;
             document.getElementById('contentVideoLoader').click();
@@ -687,51 +996,83 @@
 
         document.getElementById('contentVideoLoader').addEventListener('change', function(e) {
             const file = e.target.files[0];
-            if(!file) return;
+            if (!file) return;
 
-            // Генерируем мгновенную виртуальную ссылку на файл в памяти браузера
             const blobUrl = URL.createObjectURL(file);
             const videoId = "video_" + Date.now();
-            
-            // Сохраняем указатель на файл во временное хранилище сессии
             videoBlobsStorage[videoId] = blobUrl;
 
-            if(uploadTarget === 'devtok') {
+            if (uploadTarget === 'devtok') {
                 let toks = CloudDB.getVideos('devtok');
-                // Добавляем запись в начало глобального массива
-                toks.unshift({ id: videoId, author: currentUser, src: "", desc: file.name });
+                toks.unshift({
+                    id: videoId,
+                    author: currentUser,
+                    src: "",
+                    desc: file.name.split('.')[0]
+                });
                 CloudDB.saveVideoList('devtok', toks);
-                
-                currentPlayingIndex = 0;
+
+                currentDevTokIndex = 0;
                 renderDevTok();
-                playActiveVideo();
+                playActiveDevTokVideo();
             } else {
                 let fuls = CloudDB.getVideos('devful');
-                fuls.unshift({ id: videoId, author: currentUser, src: "", title: file.name.split('.')[0] });
+                fuls.unshift({
+                    id: videoId,
+                    author: currentUser,
+                    src: "",
+                    title: file.name.split('.')[0]
+                });
                 CloudDB.saveVideoList('devful', fuls);
                 renderDevFul();
             }
-            alert("Успешно опубликовано в общую ленту!");
+
+            alert('✅ Видео загружено в ленту!');
+            this.value = '';
         });
 
-        function renderDevFul() {
-            const grid = document.getElementById('devfulGrid');
-            grid.innerHTML = '';
-            let fuls = CloudDB.getVideos('devful');
-            if(fuls.length === 0) { grid.innerHTML = `<div style="color:gray; padding:20px;">Длинных видео пока нет.</div>`; return; }
-
-            fuls.forEach(f => {
-                let finalSrc = videoBlobsStorage[f.id] ? videoBlobsStorage[f.id] : f.src;
-                const card = document.createElement('div');
-                card.className = 'video-card-horizontal';
-                card.innerHTML = `<video src="${finalSrc}" controls></video><div class="horizontal-info"><h3>${f.title}</h3><p>Автор: ${f.author}</p></div>`;
-                grid.appendChild(card);
-            });
+        // ===== ПРОФИЛЬ =====
+        function logOutAccount() {
+            if (confirm('Вы уверены, что хотите выйти?')) {
+                localStorage.removeItem('dg_current_user');
+                currentUser = null;
+                document.getElementById('authOverlay').style.display = 'flex';
+                document.getElementById('sidebar').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'none';
+                showAuthScreen();
+            }
         }
 
-        window.onload = function() {
-            requestAllPermissions();
-        };
+        function deleteAccountPermanently() {
+            if (confirm('⚠️ ВЫ УВЕРЕНЫ?\n\nУдаление аккаунта необратимо!\nВаш юзернейм больше никогда не сможет быть восстановлен.')) {
+                if (confirm('Это последнее предупреждение. Удалить аккаунт @' + currentUser + '?')) {
+                    let users = CloudDB.getUsers();
+                    users[currentUser].deleted = true;
+                    CloudDB.saveUsers(users);
+
+                    localStorage.removeItem('dg_current_user');
+                    currentUser = null;
+
+                    alert('❌ Ваш аккаунт удален.');
+                    location.reload();
+                }
+            }
+        }
+
+        // ===== УТИЛИТЫ =====
+        function showError(elementId, message) {
+            const el = document.getElementById(elementId);
+            if (el) {
+                el.textContent = message;
+                el.style.display = 'block';
+            }
+        }
+
+        function clearElement(elementId) {
+            const el = document.getElementById(elementId);
+            if (el) el.style.display = 'none';
+        }
+    </script>
     </script>
 </body>
 </html>
