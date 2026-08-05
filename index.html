@@ -30,34 +30,43 @@
             border-radius: 10px;
             border: 2px solid #444;
             text-align: center;
-            min-width: 340px;
+            min-width: 360px;
             margin-bottom: 20px;
         }
 
         .balance-title {
             font-size: 1.5rem;
-            margin-bottom: 15px;
+            margin-bottom: 5px;
             color: #bbb;
+        }
+
+        .boost-timer-display {
+            color: #ff3399;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            display: none;
+            text-shadow: 0 0 8px #ff3399;
         }
 
         .currencies {
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 10px;
         }
 
         .crypto-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 10px;
+            padding: 8px;
             border: 3px solid transparent;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s;
             background: #333;
-            min-width: 65px;
+            min-width: 60px;
         }
 
         .crypto-item.selected {
@@ -67,33 +76,44 @@
         }
 
         .cube {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             margin-bottom: 5px;
             border-radius: 5px;
         }
-        .yellow-cube { background-color: #ffd700; box-shadow: 0 0 10px #ffd700; }
-        .blue-cube { background-color: #00c8ff; box-shadow: 0 0 10px #00c8ff; }
-        .green-cube { background-color: #00ff66; box-shadow: 0 0 10px #00ff66; }
-        .ruby-cube { background-color: #ff0055; box-shadow: 0 0 10px #ff0055; }
+        .yellow-cube { background-color: #ffd700; box-shadow: 0 0 8px #ffd700; }
+        .blue-cube { background-color: #00c8ff; box-shadow: 0 0 8px #00c8ff; }
+        .green-cube { background-color: #00ff66; box-shadow: 0 0 8px #00ff66; }
+        .ruby-cube { background-color: #ff0055; box-shadow: 0 0 8px #ff0055; }
+        .rainbow-cube { 
+            background: linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #8b00ff); 
+            box-shadow: 0 0 10px #ffffff;
+            animation: rainbow-anim 3s infinite linear;
+        }
+
+        @keyframes rainbow-anim {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
         
         .currency-symbol {
-            width: 40px;
-            height: 40px;
-            line-height: 40px;
-            font-size: 2rem;
+            width: 36px;
+            height: 36px;
+            line-height: 36px;
+            font-size: 1.8rem;
             font-weight: bold;
             text-align: center;
         }
         .dollar-sign { color: #2ecc71; }
         .ruble-sign { color: #ff9900; }
+        .btc-sign { color: #f2a900; }
 
         .btn-link {
             color: #00c8ff;
             text-decoration: underline;
             cursor: pointer;
-            font-size: 1.1rem;
-            margin-top: 10px;
+            font-size: 1rem;
+            margin-top: 8px;
             display: block;
         }
 
@@ -104,12 +124,27 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 1.1rem;
-            margin-top: 15px;
+            margin-top: 12px;
             display: inline-block;
             font-weight: bold;
             background: rgba(255, 204, 0, 0.1);
         }
         .bank-btn-trigger:hover { background: rgba(255, 204, 0, 0.3); }
+
+        .biz-btn-trigger {
+            color: #00ff66;
+            border: 2px solid #00ff66;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            margin-top: 12px;
+            display: inline-block;
+            font-weight: bold;
+            background: rgba(0, 255, 102, 0.1);
+            margin-left: 5px;
+        }
+        .biz-btn-trigger:hover { background: rgba(0, 255, 102, 0.3); }
 
         .bet-section {
             background: #2a2a2a;
@@ -117,16 +152,16 @@
             border-radius: 10px;
             border: 2px solid #444;
             text-align: center;
-            width: 340px;
+            width: 360px;
             margin-bottom: 20px;
         }
 
         .bet-section input, .modal-content input, .modal-content select {
-            width: 80%;
+            width: 85%;
             padding: 10px;
             border-radius: 5px;
             border: none;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             font-size: 1.1rem;
             text-align: center;
             box-sizing: border-box;
@@ -138,8 +173,8 @@
             background: #ff3366;
             color: white;
             border: none;
-            padding: 12px 30px;
-            font-size: 1.2rem;
+            padding: 12px 20px;
+            font-size: 1.1rem;
             font-weight: bold;
             border-radius: 5px;
             cursor: pointer;
@@ -150,14 +185,14 @@
 
         .boxes-container {
             display: flex;
-            gap: 15px;
+            gap: 12px;
             margin-top: 15px;
             justify-content: center;
         }
 
         .box {
-            width: 50px;
-            height: 50px;
+            width: 48px;
+            height: 48px;
             background: #444;
             border: 2px solid #666;
             border-radius: 5px;
@@ -182,7 +217,7 @@
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.85);
             justify-content: center;
             align-items: center;
             z-index: 10;
@@ -190,23 +225,23 @@
 
         .modal-content {
             background: #222;
-            padding: 25px;
+            padding: 20px;
             border-radius: 15px;
             border: 2px solid #00c8ff;
-            width: 380px;
+            width: 400px;
             text-align: center;
             max-height: 90vh;
             overflow-y: auto;
+            box-sizing: border-box;
         }
 
         .exchange-row {
-            margin: 10px 0;
+            margin: 8px 0;
             padding: 8px;
             background: #333;
             border-radius: 8px;
         }
-
-        .exchange-row h4 { margin: 0 0 8px 0; font-size: 0.95rem; }
+        .exchange-row h4 { margin: 0 0 6px 0; font-size: 0.95rem; }
 
         .ex-btn {
             background: #00c8ff;
@@ -239,7 +274,7 @@
             font-size: 0.8rem;
             border-radius: 5px;
             cursor: pointer;
-            margin-top: 30px;
+            margin-top: 20px;
         }
         .reset-btn:hover { color: #ff3366; border-color: #ff3366; }
 
@@ -249,15 +284,14 @@
             top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(150, 0, 0, 0.9);
             color: #ffffff;
-            font-size: 4rem;
+            font-size: 3rem;
             font-weight: 900;
             text-align: center;
             justify-content: center;
             align-items: center;
             z-index: 999;
-            text-shadow: 0 0 20px black;
-            box-sizing: border-box;
             padding: 20px;
+            box-sizing: border-box;
         }
 
         .bank-tabs {
@@ -277,6 +311,17 @@
             background: #ffcc00;
             color: black;
         }
+
+        .biz-card {
+            background: #333;
+            border: 1px solid #555;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            text-align: left;
+        }
+        .biz-card h4 { margin: 0 0 5px 0; color: #00ff66; }
+        .biz-card p { margin: 3px 0; font-size: 0.85rem; color: #ccc; }
     </style>
 </head>
 <body>
@@ -287,7 +332,8 @@
 
     <div class="balance-container">
         <div class="balance-title">Ваш Баланс</div>
-        <p style="font-size: 0.85rem; color: #888; margin-top:-10px;">(Кликните на валюту, чтобы выбрать для игры)</p>
+        <div id="boost-timer" class="boost-timer-display">🔥 X2 МУЛЬТИПЛИКАТОР: 03:00</div>
+        
         <div class="currencies">
             <div class="crypto-item selected" onclick="selectCurrency('yellow')" id="coin-yellow">
                 <div class="cube yellow-cube"></div>
@@ -305,6 +351,10 @@
                 <div class="cube ruby-cube"></div>
                 <span id="bal-ruby">0</span>
             </div>
+            <div class="crypto-item" onclick="selectCurrency('rainbow')" id="coin-rainbow">
+                <div class="cube rainbow-cube"></div>
+                <span id="bal-rainbow">0</span>
+            </div>
             <div class="crypto-item" onclick="selectCurrency('usd')" id="coin-usd">
                 <div class="currency-symbol dollar-sign">$</div>
                 <span id="bal-usd">0</span>
@@ -313,21 +363,29 @@
                 <div class="currency-symbol ruble-sign">₽</div>
                 <span id="bal-rub">0</span>
             </div>
+            <div class="crypto-item" onclick="selectCurrency('btc')" id="coin-btc">
+                <div class="currency-symbol btc-sign">₿</div>
+                <span id="bal-btc">0</span>
+            </div>
         </div>
-        
-        <div class="bank-btn-trigger" onclick="openBankModal()">🏦 БАНК (Кредиты & Вклады)</div>
+
+        <div style="margin-top: 10px;">
+            <div class="bank-btn-trigger" onclick="openBankModal()">🏦 БАНК</div>
+            <div class="biz-btn-trigger" onclick="openBizModal()">💼 БИЗНЕСЫ</div>
+        </div>
 
         <div class="btn-link" onclick="openModal()">Быстрый обмен (Кубы)</div>
+        <div class="btn-link" style="color: #f2a900;" onclick="openBtcModal()">Рынок Биткоина (₿)</div>
         <div class="btn-link" style="color: #00ff66;" onclick="openBulkModal()">Массовый перевод валюты</div>
-        <div class="btn-link" style="color: #ffcc00;" onclick="openAdminModal()">Админ-панель (Чит-код)</div>
+        <div class="btn-link" style="color: #ffcc00;" onclick="openAdminModal()">Чит-коды / Админка</div>
     </div>
 
     <div class="bet-section">
         <h3>Сделать Ставку</h3>
-        <input type="text" id="bet-amount" placeholder="Например: 100, 1k, 2.5m, 1kv" value="1">
+        <input type="text" id="bet-amount" placeholder="Например: 100, 1k, 1b, 1sk" value="1">
         <button class="main-btn" onclick="startBet()">Подтвердить ставку</button>
         
-        <div class="system-msg" id="msg">Выберите валюту наверху, введите сумму и нажмите кнопку</div>
+        <div class="system-msg" id="msg">Выберите валюту, введите сумму и нажмите кнопку</div>
 
         <div class="boxes-container">
             <div class="box disabled" onclick="clickBox(1)" id="box1">?</div>
@@ -335,6 +393,58 @@
             <div class="box disabled" onclick="clickBox(3)" id="box3">?</div>
             <div class="box disabled" onclick="clickBox(4)" id="box4">?</div>
             <div class="box disabled" onclick="clickBox(5)" id="box5">?</div>
+        </div>
+    </div>
+
+    <!-- Модалка Биткоина -->
+    <div class="modal" id="btcModal">
+        <div class="modal-content" style="border-color: #f2a900;">
+            <h3>Торговля Биткоином</h3>
+            <p style="font-size: 0.9rem; color: #aaa;">Курс меняется каждую минуту чисто на рандом!</p>
+            <h2 style="color: #f2a900; margin: 10px 0;">1 ₿ = $<span id="btc-rate-display">50K</span></h2>
+            
+            <input type="text" id="btc-input-amount" placeholder="Количество ₿">
+            
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button class="ex-btn" style="padding: 10px 20px; font-size: 1rem;" onclick="buyBTC()">Купить ₿</button>
+                <button class="ex-btn" style="padding: 10px 20px; font-size: 1rem; background: #ff3366; color: white;" onclick="sellBTC()">Продать ₿</button>
+            </div>
+            
+            <button class="back-btn" onclick="closeBtcModal()">Закрыть</button>
+        </div>
+    </div>
+
+    <!-- Модалка Бизнеса -->
+    <div class="modal" id="bizModal">
+        <div class="modal-content" style="border-color: #00ff66;">
+            <h3>Покупка Бизнеса</h3>
+            <p style="font-size: 0.85rem; color: #aaa;">Бизнесы приносят доход в $ каждую минуту!</p>
+
+            <div class="biz-card">
+                <h4>🥖 Пекарня</h4>
+                <p>Цена: <b>$50M</b></p>
+                <p>Доход: <b>$500K / мин</b></p>
+                <p id="biz-status-bakery">Статус: Не куплено</p>
+                <button class="ex-btn" id="biz-btn-bakery" onclick="buyBusiness('bakery')">Купить</button>
+            </div>
+
+            <div class="biz-card">
+                <h4>🖥️ Компьютерный Клуб</h4>
+                <p>Цена: <b>$1B</b></p>
+                <p>Доход: <b>$10M / мин</b></p>
+                <p id="biz-status-club">Статус: Не куплено</p>
+                <button class="ex-btn" id="biz-btn-club" onclick="buyBusiness('club')">Купить</button>
+            </div>
+
+            <div class="biz-card">
+                <h4>🏨 Отель</h4>
+                <p>Цена: <b>$100B</b></p>
+                <p>Доход: <b>$1B / мин</b></p>
+                <p id="biz-status-hotel">Статус: Не куплено</p>
+                <button class="ex-btn" id="biz-btn-hotel" onclick="buyBusiness('hotel')">Купить</button>
+            </div>
+
+            <button class="back-btn" onclick="closeBizModal()">Закрыть</button>
         </div>
     </div>
 
@@ -348,36 +458,36 @@
                 <div class="bank-tab" id="tab-deposit-btn" onclick="switchBankTab('deposit')">Вклад ($)</div>
             </div>
 
-            <!-- Вкладка Кредита -->
             <div id="tab-loan">
                 <div id="loan-active-info" style="display: none; background: #333; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
                     <p style="margin: 5px 0; color: #ffcc00;">Активный кредит!</p>
-                    <p style="margin: 5px 0;" id="loan-timer-display">Осталось времени: --:--</p>
+                    <p style="margin: 5px 0;" id="loan-timer-display">Осталось: --:--</p>
                     <p style="margin: 5px 0; font-size: 0.85rem;" id="loan-payback-display">К возврату: $0</p>
                     <button class="main-btn" style="background: #2ecc71; margin-top: 10px; padding: 8px 15px; font-size: 1rem;" onclick="repayLoanEarly()">Погасить досрочно</button>
                 </div>
 
                 <div id="loan-form">
-                    <p style="font-size: 0.85rem; color: #aaa;">Макс. заем: 3x от ваших $ на балансе</p>
+                    <p style="font-size: 0.85rem; color: #aaa;">Макс. заем: 3x от ваших $</p>
                     <input type="text" id="loan-amount" placeholder="Сумма кредита ($)">
-                    
-                    <label style="font-size: 0.85rem; color: #aaa;">Срок займа:</label>
                     <select id="loan-time">
                         <option value="1">1 мин (+5%)</option>
                         <option value="3">3 мин (+10%)</option>
                         <option value="5">5 мин (+15%)</option>
                         <option value="10">10 мин (+25%)</option>
                     </select>
-
                     <button class="main-btn" onclick="takeLoan()">Взять кредит</button>
                 </div>
             </div>
 
-            <!-- Вкладка Депозита -->
             <div id="tab-deposit" style="display: none;">
-                <p style="font-size: 0.85rem; color: #aaa;">Каждую минуту +5% к сумме. <br><span style="color: #ff3366;">Шанс 5%/мин, что банк обокрадут!</span></p>
+                <p style="font-size: 0.85rem; color: #aaa;">Каждую минуту +5% к вкладу. <br><span style="color: #ff3366;">Шанс 5%/мин, что банк обокрадут!</span></p>
                 <p style="font-size: 1.1rem; color: #00ff66;">В банке лежит: <b id="bank-deposit-amount">$0</b></p>
                 
+                <div style="background: #333; padding: 10px; border-radius: 8px; margin-bottom: 12px;">
+                    <p style="margin: 0 0 5px 0; font-size: 0.85rem;" id="insurance-status-text">Страховка: <b>Отсутствует</b></p>
+                    <button class="ex-btn" style="background: #ffcc00;" onclick="buyInsurance()">Купить страховку ($5M)</button>
+                </div>
+
                 <input type="text" id="deposit-amount" placeholder="Сумма ($)">
                 <button class="main-btn" style="background: #00c8ff; margin-bottom: 10px;" onclick="depositMoney()">Вложить</button>
                 <button class="main-btn" style="background: #2ecc71;" onclick="withdrawMoney()">Забрать все</button>
@@ -392,24 +502,29 @@
         <div class="modal-content">
             <h3>Быстрый Обмен Кубов</h3>
             <div class="exchange-row">
-                <h4>Золотой кубик ↔ 100$</h4>
+                <h4>Золотой ↔ 100$</h4>
                 <button class="ex-btn" onclick="exchange('yellow', 'usd')">Кубик в $</button>
                 <button class="ex-btn" onclick="exchange('usd', 'yellow')">$ в Кубик</button>
             </div>
             <div class="exchange-row">
-                <h4>Алмазный кубик ↔ 500$</h4>
+                <h4>Алмазный ↔ 500$</h4>
                 <button class="ex-btn" onclick="exchange('blue', 'usd')">Кубик в $</button>
                 <button class="ex-btn" onclick="exchange('usd', 'blue')">$ в Кубик</button>
             </div>
             <div class="exchange-row">
-                <h4>Изумрудный кубик ↔ 1 000$</h4>
+                <h4>Изумрудный ↔ 1 000$</h4>
                 <button class="ex-btn" onclick="exchange('green', 'usd')">Кубик в $</button>
                 <button class="ex-btn" onclick="exchange('usd', 'green')">$ в Кубик</button>
             </div>
             <div class="exchange-row">
-                <h4>Рубиновый кубик ↔ 10 000$</h4>
+                <h4>Рубиновый ↔ 10 000$</h4>
                 <button class="ex-btn" onclick="exchange('ruby', 'usd')">Кубик в $</button>
                 <button class="ex-btn" onclick="exchange('usd', 'ruby')">$ в Кубик</button>
+            </div>
+            <div class="exchange-row">
+                <h4>Радужный ↔ 1 000 000 000$ (1B)</h4>
+                <button class="ex-btn" onclick="exchange('rainbow', 'usd')">Кубик в $</button>
+                <button class="ex-btn" onclick="exchange('usd', 'rainbow')">$ в Кубик</button>
             </div>
             <button class="back-btn" onclick="closeModal()">Назад</button>
         </div>
@@ -425,6 +540,7 @@
                 <option value="blue">Алмазные кубики</option>
                 <option value="green">Изумрудные кубики</option>
                 <option value="ruby">Рубиновые кубики</option>
+                <option value="rainbow">Радужные кубики</option>
                 <option value="usd">Доллары ($)</option>
                 <option value="rub">Рубли (₽)</option>
             </select>
@@ -435,15 +551,16 @@
                 <option value="yellow">Золотые кубики</option>
                 <option value="green">Изумрудные кубики</option>
                 <option value="ruby">Рубиновые кубики</option>
+                <option value="rainbow">Радужные кубики</option>
                 <option value="usd">Доллары ($)</option>
                 <option value="rub">Рубли (₽)</option>
             </select>
 
             <label style="font-size: 0.85rem; color: #aaa;">Сколько нужно ПОЛУЧИТЬ:</label>
-            <input type="text" id="bulk-amount" placeholder="Например: 1k, 500, 2m, 1kv" oninput="calculateBulkCost()">
+            <input type="text" id="bulk-amount" placeholder="Например: 1k, 500, 1b, 1sk" oninput="calculateBulkCost()">
 
             <div id="bulk-info" style="margin: 10px 0; font-size: 0.95rem; color: #ffcc00; min-height: 40px;">
-                Введите число для расчета...
+                Введите число...
             </div>
 
             <button class="main-btn" onclick="executeBulkExchange()">Обменять</button>
@@ -451,46 +568,56 @@
         </div>
     </div>
 
-    <!-- Модалка Админки -->
+    <!-- Модалка Админки и Промокодов -->
     <div class="modal" id="adminModal">
         <div class="modal-content" style="border-color: #ffcc00;">
-            <h3>Админ-панель</h3>
+            <h3>Чит-коды и Админка</h3>
             <div id="admin-step-pass">
-                <p>Введите пароль администратора:</p>
-                <input type="password" id="admin-pass-input" placeholder="Пароль">
-                <button class="main-btn" onclick="verifyPassword()">Войти</button>
+                <p style="font-size: 0.9rem; color: #aaa;">Введите промокод или пароль админа:</p>
+                <input type="text" id="admin-pass-input" placeholder="Код / Пароль">
+                <button class="main-btn" onclick="verifyPassword()">Ввести</button>
                 <div id="admin-pass-error" style="color: #ff3366; margin-top: 10px; font-size: 0.9rem;"></div>
             </div>
 
             <div id="admin-step-amount" style="display: none;">
-                <p>Пароль подтвержден!</p>
-                <p style="font-size: 0.85rem; color: #aaa;">Введите сумму (поддерживаются K, M, B, T, P, E, KV, TR, SK, например: 500k, 1kv, -500):</p>
-                <input type="text" id="admin-amount-input" placeholder="Например: 500k или -1.5m">
-                <button class="main-btn" onclick="applyBalanceChange()">Применить</button>
+                <p style="color: #00ff66;">Пароль админа подтвержден!</p>
+                <input type="text" id="admin-amount-input" placeholder="Сумма (например: 500k, 1dr)">
+                <button class="main-btn" onclick="applyBalanceChange()">Применить к выбранной валюте</button>
             </div>
 
             <button class="back-btn" onclick="closeAdminModal()">Отмена</button>
         </div>
     </div>
 
-    <button class="reset-btn" onclick="resetGame()">Сбросить прогресс (Выдать 3 Золотых)</button>
-
+    <button class="reset-btn" onclick="resetGame()">Сбросить прогресс</button>
     <script>
-        const defaultBalances = { yellow: 3, blue: 0, green: 0, ruby: 0, usd: 0, rub: 0 };
+        const defaultBalances = { yellow: 3, blue: 0, green: 0, ruby: 0, rainbow: 0, usd: 0, rub: 0, btc: 0 };
         let balances = {};
 
-        // Данные банка
+        // Данные банка, бизнеса и промокодов
         let bankDeposit = 0;
+        let hasInsurance = false;
         let activeLoan = null;
+        let usedPromos = [];
+        let boostEndTime = 0;
 
-        // Эквивалент всех валют в Долларах ($)
+        let btcPrice = 50000; // Динамическая цена BTC ($50K - $1B)
+
+        let businesses = {
+            bakery: { name: "Пекарня", price: 50000000, income: 500000, owned: false },
+            club: { name: "Компьютерный клуб", price: 1000000000, income: 10000000, owned: false },
+            hotel: { name: "Отель", price: 100000000000, income: 1000000000, owned: false }
+        };
+
+        // Эквивалент валют в $
         const currencyValuesInUSD = { 
             usd: 1, 
             rub: 0.01, 
             yellow: 100, 
             blue: 500, 
             green: 1000, 
-            ruby: 10000 
+            ruby: 10000,
+            rainbow: 1000000000
         };
         
         const currencyNames = { 
@@ -499,7 +626,8 @@
             yellow: "Золотых кубиков", 
             blue: "Алмазных кубиков", 
             green: "Изумрудных кубиков", 
-            ruby: "Рубиновых кубиков" 
+            ruby: "Рубиновых кубиков",
+            rainbow: "Радужных кубиков"
         };
 
         let selectedCurrency = 'yellow';
@@ -512,6 +640,9 @@
             const sign = num < 0 ? "-" : "";
 
             const units = [
+                { value: 1e36, symbol: "GL" },
+                { value: 1e33, symbol: "WN" },
+                { value: 1e30, symbol: "DR" },
                 { value: 1e27, symbol: "SK" },
                 { value: 1e24, symbol: "TR" },
                 { value: 1e21, symbol: "KV" },
@@ -539,19 +670,11 @@
             if (!str) return NaN;
 
             const multipliers = { 
-                'k': 1e3, 
-                'm': 1e6, 
-                'b': 1e9, 
-                't': 1e12, 
-                'p': 1e15, 
-                'e': 1e18,
-                'kv': 1e21,
-                'tr': 1e24,
-                'sk': 1e27
+                'k': 1e3, 'm': 1e6, 'b': 1e9, 't': 1e12, 'p': 1e15, 'e': 1e18,
+                'kv': 1e21, 'tr': 1e24, 'sk': 1e27, 'dr': 1e30, 'wn': 1e33, 'gl': 1e36
             };
 
-            // Проверяем составные буквенные суффиксы (kv, tr, sk)
-            for (const key of ['sk', 'tr', 'kv']) {
+            for (const key of ['gl', 'wn', 'dr', 'sk', 'tr', 'kv']) {
                 if (str.endsWith(key)) {
                     const numberPart = parseFloat(str.slice(0, -key.length));
                     if (isNaN(numberPart)) return NaN;
@@ -559,7 +682,6 @@
                 }
             }
 
-            // Однобуквенные суффиксы
             const lastChar = str.slice(-1);
             if (multipliers[lastChar]) {
                 const numberPart = parseFloat(str.slice(0, -1));
@@ -573,15 +695,22 @@
 
         function loadGame() {
             const savedData = localStorage.getItem('casino_save_data');
-            if (savedData) {
-                balances = { ...defaultBalances, ...JSON.parse(savedData) };
-            } else {
-                balances = { ...defaultBalances };
-            }
+            if (savedData) balances = { ...defaultBalances, ...JSON.parse(savedData) };
+            else balances = { ...defaultBalances };
 
             bankDeposit = parseInt(localStorage.getItem('casino_bank_deposit') || '0');
+            hasInsurance = localStorage.getItem('casino_bank_insurance') === 'true';
+            
             const savedLoan = localStorage.getItem('casino_active_loan');
             if (savedLoan) activeLoan = JSON.parse(savedLoan);
+
+            const savedBiz = localStorage.getItem('casino_businesses');
+            if (savedBiz) businesses = JSON.parse(savedBiz);
+
+            const savedPromos = localStorage.getItem('casino_used_promos');
+            if (savedPromos) usedPromos = JSON.parse(savedPromos);
+
+            boostEndTime = parseInt(localStorage.getItem('casino_boost_end') || '0');
 
             updateUI();
         }
@@ -589,11 +718,17 @@
         function saveGame() {
             localStorage.setItem('casino_save_data', JSON.stringify(balances));
             localStorage.setItem('casino_bank_deposit', bankDeposit.toString());
-            if (activeLoan) {
-                localStorage.setItem('casino_active_loan', JSON.stringify(activeLoan));
-            } else {
-                localStorage.removeItem('casino_active_loan');
-            }
+            localStorage.setItem('casino_bank_insurance', hasInsurance.toString());
+            localStorage.setItem('casino_businesses', JSON.stringify(businesses));
+            localStorage.setItem('casino_used_promos', JSON.stringify(usedPromos));
+            localStorage.setItem('casino_boost_end', boostEndTime.toString());
+
+            if (activeLoan) localStorage.setItem('casino_active_loan', JSON.stringify(activeLoan));
+            else localStorage.removeItem('casino_active_loan');
+        }
+
+        function isBoostActive() {
+            return Date.now() < boostEndTime;
         }
 
         function updateUI() {
@@ -601,142 +736,184 @@
             document.getElementById('bal-blue').innerText = formatNumber(balances.blue);
             document.getElementById('bal-green').innerText = formatNumber(balances.green);
             document.getElementById('bal-ruby').innerText = formatNumber(balances.ruby);
+            document.getElementById('bal-rainbow').innerText = formatNumber(balances.rainbow);
+            document.getElementById('bal-btc').innerText = formatNumber(balances.btc);
             
-            // USD
-            if (balances.usd < 0) {
-                document.getElementById('bal-usd').innerText = "-" + formatNumber(Math.abs(balances.usd));
-            } else {
-                document.getElementById('bal-usd').innerText = formatNumber(balances.usd);
-            }
-
-            // RUB
-            if (balances.rub < 0) {
-                document.getElementById('bal-rub').innerText = "-" + formatNumber(Math.abs(balances.rub));
-            } else {
-                document.getElementById('bal-rub').innerText = formatNumber(balances.rub);
-            }
+            document.getElementById('bal-usd').innerText = (balances.usd < 0 ? "-" : "") + formatNumber(Math.abs(balances.usd));
+            document.getElementById('bal-rub').innerText = (balances.rub < 0 ? "-" : "") + formatNumber(Math.abs(balances.rub));
 
             document.getElementById('bank-deposit-amount').innerText = "$" + formatNumber(bankDeposit);
+            document.getElementById('insurance-status-text').innerHTML = `Страховка: <b>${hasInsurance ? 'АКТИВНА ✅' : 'Отсутствует ❌'}</b>`;
+
+            // Обновление видов бизнеса
+            document.getElementById('biz-status-bakery').innerText = businesses.bakery.owned ? "Статус: Куплено" : "Статус: Не куплено";
+            document.getElementById('biz-status-club').innerText = businesses.club.owned ? "Статус: Куплено" : "Статус: Не куплено";
+            document.getElementById('biz-status-hotel').innerText = businesses.hotel.owned ? "Статус: Куплено" : "Статус: Не куплено";
+
             updateLoanUI();
         }
 
-        /* ТАЙМЕРЫ И БАНКОВСКИЕ ЦИКЛЫ */
+        /* ТАЙМЕРЫ (1 сек и 1 мин) */
         setInterval(() => {
+            // Кредит
             if (activeLoan) {
-                const now = Date.now();
-                if (now >= activeLoan.endTime) {
+                if (Date.now() >= activeLoan.endTime) {
                     balances.usd -= activeLoan.amountToPay;
-                    alert(`Время кредита истекло! С вашего счета списано $${formatNumber(activeLoan.amountToPay)}`);
+                    alert(`Время кредита истекло! Списано $${formatNumber(activeLoan.amountToPay)}`);
                     activeLoan = null;
                     saveGame();
                     updateUI();
-                } else {
-                    updateLoanUI();
-                }
+                } else updateLoanUI();
+            }
+
+            // X2 Буст таймер
+            const boostDisplay = document.getElementById('boost-timer');
+            if (isBoostActive()) {
+                const leftSec = Math.ceil((boostEndTime - Date.now()) / 1000);
+                const m = Math.floor(leftSec / 60);
+                const s = leftSec % 60;
+                boostDisplay.style.display = 'block';
+                boostDisplay.innerText = `🔥 X2 МУЛЬТИПЛИКАТОР: ${m}:${s < 10 ? '0' : ''}${s}`;
+            } else {
+                boostDisplay.style.display = 'none';
             }
         }, 1000);
 
         setInterval(() => {
+            // 1. Рандомный Биткоин ($50K - $1B)
+            btcPrice = Math.floor(Math.random() * (1000000000 - 50000 + 1)) + 50000;
+            document.getElementById('btc-rate-display').innerText = formatNumber(btcPrice);
+
+            // 2. Банковский Вклад (+5% / x2 если буст)
             if (bankDeposit > 0) {
-                if (Math.random() < 0.05) {
-                    bankDeposit = 0;
-                    saveGame();
-                    updateUI();
-                    triggerRobberyAlert();
+                if (Math.random() < 0.05) { // 5% шанс ограбления
+                    if (hasInsurance) {
+                        hasInsurance = false;
+                        alert("Банк обокрали! Страховка сработала: деньги спасены, но страховка сгорела!");
+                    } else {
+                        bankDeposit = 0;
+                        triggerRobberyAlert();
+                    }
                 } else {
-                    bankDeposit = Math.round(bankDeposit * 1.05);
-                    saveGame();
-                    updateUI();
+                    let interestRate = isBoostActive() ? 0.10 : 0.05;
+                    bankDeposit = Math.round(bankDeposit * (1 + interestRate));
                 }
             }
+
+            // 3. Доход от бизнеса
+            let totalBizIncome = 0;
+            if (businesses.bakery.owned) totalBizIncome += businesses.bakery.income;
+            if (businesses.club.owned) totalBizIncome += businesses.club.income;
+            if (businesses.hotel.owned) totalBizIncome += businesses.hotel.income;
+
+            if (totalBizIncome > 0) {
+                balances.usd += totalBizIncome;
+            }
+
+            saveGame();
+            updateUI();
         }, 60000);
 
         function triggerRobberyAlert() {
             const alertElem = document.getElementById('robbery-alert');
             alertElem.style.display = 'flex';
-            setTimeout(() => {
-                alertElem.style.display = 'none';
-            }, 5000);
+            setTimeout(() => { alertElem.style.display = 'none'; }, 5000);
         }
 
-        /* БАНК */
-        function openBankModal() {
-            if (isGameActive) return;
-            document.getElementById('bankModal').style.display = 'flex';
-            updateLoanUI();
+        /* БИТКОИН */
+        function openBtcModal() { if (!isGameActive) document.getElementById('btcModal').style.display = 'flex'; }
+        function closeBtcModal() { document.getElementById('btcModal').style.display = 'none'; }
+
+        function buyBTC() {
+            const amount = parseFormattedInput(document.getElementById('btc-input-amount').value);
+            if (isNaN(amount) || amount <= 0) return alert("Введите правильное количество ₿");
+            
+            const cost = amount * btcPrice;
+            if (balances.usd < cost) return alert(`Недостаточно $! Нужно: $${formatNumber(cost)}`);
+
+            balances.usd -= cost;
+            balances.btc += amount;
+            saveGame(); updateUI();
+            alert(`Успешно куплено ${formatNumber(amount)} ₿!`);
         }
 
-        function closeBankModal() {
-            document.getElementById('bankModal').style.display = 'none';
+        function sellBTC() {
+            const amount = parseFormattedInput(document.getElementById('btc-input-amount').value);
+            if (isNaN(amount) || amount <= 0) return alert("Введите правильное количество ₿");
+            if (balances.btc < amount) return alert("У вас нет столько Биткоинов!");
+
+            const income = amount * btcPrice;
+            balances.btc -= amount;
+            balances.usd += income;
+            saveGame(); updateUI();
+            alert(`Успешно продано ${formatNumber(amount)} ₿ за $${formatNumber(income)}!`);
         }
+
+        /* БИЗНЕСЫ */
+        function openBizModal() { if (!isGameActive) document.getElementById('bizModal').style.display = 'flex'; }
+        function closeBizModal() { document.getElementById('bizModal').style.display = 'none'; }
+
+        function buyBusiness(type) {
+            const biz = businesses[type];
+            if (biz.owned) return alert("Вы уже купили этот бизнес!");
+
+            if (balances.usd < biz.price) return alert(`Недостаточно денег! Нужно: $${formatNumber(biz.price)}`);
+
+            balances.usd -= biz.price;
+            biz.owned = true;
+            saveGame(); updateUI();
+            alert(`Вы успешно купили бизнес: ${biz.name}!`);
+        }
+
+        /* БАНК & СТРАХОВКА */
+        function openBankModal() { if (!isGameActive) document.getElementById('bankModal').style.display = 'flex'; updateLoanUI(); }
+        function closeBankModal() { document.getElementById('bankModal').style.display = 'none'; }
 
         function switchBankTab(tab) {
-            if (tab === 'loan') {
-                document.getElementById('tab-loan').style.display = 'block';
-                document.getElementById('tab-deposit').style.display = 'none';
-                document.getElementById('tab-loan-btn').classList.add('active');
-                document.getElementById('tab-deposit-btn').classList.remove('active');
-            } else {
-                document.getElementById('tab-loan').style.display = 'none';
-                document.getElementById('tab-deposit').style.display = 'block';
-                document.getElementById('tab-loan-btn').classList.remove('active');
-                document.getElementById('tab-deposit-btn').classList.add('active');
-            }
+            document.getElementById('tab-loan').style.display = tab === 'loan' ? 'block' : 'none';
+            document.getElementById('tab-deposit').style.display = tab === 'deposit' ? 'block' : 'none';
+            document.getElementById('tab-loan-btn').classList.toggle('active', tab === 'loan');
+            document.getElementById('tab-deposit-btn').classList.toggle('active', tab === 'deposit');
+        }
+
+        function buyInsurance() {
+            if (hasInsurance) return alert("У вас уже есть активная страховка!");
+            if (balances.usd < 5000000) return alert("Страховка стоит $5M! У вас недостаточно средств.");
+
+            balances.usd -= 5000000;
+            hasInsurance = true;
+            saveGame(); updateUI();
+            alert("Страховка успешно приобретена!");
         }
 
         function takeLoan() {
-            if (activeLoan) {
-                alert("У вас уже есть невыплаченный кредит!");
-                return;
-            }
+            if (activeLoan) return alert("У вас уже есть невыплаченный кредит!");
 
-            const inputVal = document.getElementById('loan-amount').value;
-            const amount = parseFormattedInput(inputVal);
+            const amount = parseFormattedInput(document.getElementById('loan-amount').value);
             const timeMinutes = parseInt(document.getElementById('loan-time').value);
+            if (isNaN(amount) || amount <= 0) return alert("Введите корректную сумму!");
 
-            if (isNaN(amount) || amount <= 0) {
-                alert("Введите правильную сумму кредита!");
-                return;
-            }
+            const maxLoan = Math.max(0, balances.usd * 3);
+            if (balances.usd <= 0 || amount > maxLoan) return alert(`Макс. заем: $${formatNumber(maxLoan)}`);
 
-            const maxLoanAllowed = Math.max(0, balances.usd * 3);
-
-            if (balances.usd <= 0 || amount > maxLoanAllowed) {
-                alert(`Вы можете взять в кредит не более 3х от вашего текущего $ баланса! (Максимум: $${formatNumber(maxLoanAllowed)})`);
-                return;
-            }
-
-            let percent = 0.05;
-            if (timeMinutes === 3) percent = 0.10;
-            if (timeMinutes === 5) percent = 0.15;
-            if (timeMinutes === 10) percent = 0.25;
-
-            const amountToPay = Math.round(amount * (1 + percent));
+            let percents = { 1: 0.05, 3: 0.10, 5: 0.15, 10: 0.25 };
+            const amountToPay = Math.round(amount * (1 + percents[timeMinutes]));
             const endTime = Date.now() + (timeMinutes * 60 * 1000);
 
             activeLoan = { amountToPay, endTime };
             balances.usd += amount;
-
-            saveGame();
-            updateUI();
-            alert(`Кредит на $${formatNumber(amount)} получен! Вернуть через ${timeMinutes} мин: $${formatNumber(amountToPay)}`);
+            saveGame(); updateUI();
+            alert(`Кредит получен! Вернуть: $${formatNumber(amountToPay)}`);
         }
 
         function repayLoanEarly() {
             if (!activeLoan) return;
-
-            if (balances.usd < activeLoan.amountToPay) {
-                alert(`Недостаточно средств для погашения! Вам нужно: $${formatNumber(activeLoan.amountToPay)}`);
-                return;
-            }
+            if (balances.usd < activeLoan.amountToPay) return alert(`Вам нужно $${formatNumber(activeLoan.amountToPay)}`);
 
             balances.usd -= activeLoan.amountToPay;
-            const paidAmount = activeLoan.amountToPay;
             activeLoan = null;
-
-            saveGame();
-            updateUI();
-            alert(`Кредит на сумму $${formatNumber(paidAmount)} успешно погашен досрочно!`);
+            saveGame(); updateUI();
+            alert("Кредит успешно погашен!");
         }
 
         function updateLoanUI() {
@@ -748,10 +925,7 @@
                 loanForm.style.display = 'none';
 
                 const timeLeftSec = Math.max(0, Math.floor((activeLoan.endTime - Date.now()) / 1000));
-                const mins = Math.floor(timeLeftSec / 60);
-                const secs = timeLeftSec % 60;
-
-                document.getElementById('loan-timer-display').innerText = `Осталось времени: ${mins}:${secs < 10 ? '0' : ''}${secs}`;
+                document.getElementById('loan-timer-display').innerText = `Осталось: ${Math.floor(timeLeftSec / 60)}:${timeLeftSec % 60 < 10 ? '0' : ''}${timeLeftSec % 60}`;
                 document.getElementById('loan-payback-display').innerText = `К возврату: $${formatNumber(activeLoan.amountToPay)}`;
             } else {
                 activeInfo.style.display = 'none';
@@ -760,82 +934,54 @@
         }
 
         function depositMoney() {
-            const inputVal = document.getElementById('deposit-amount').value;
-            const amount = parseFormattedInput(inputVal);
-
-            if (isNaN(amount) || amount <= 0) {
-                alert("Введите корректную сумму для вклада!");
-                return;
-            }
-
-            if (balances.usd < amount) {
-                alert("Недостаточно долларов на балансе!");
-                return;
-            }
+            const amount = parseFormattedInput(document.getElementById('deposit-amount').value);
+            if (isNaN(amount) || amount <= 0) return alert("Введите корректную сумму!");
+            if (balances.usd < amount) return alert("Недостаточно долларов!");
 
             balances.usd -= amount;
             bankDeposit += amount;
             document.getElementById('deposit-amount').value = '';
-
-            saveGame();
-            updateUI();
-            alert(`Успешно положено на вклад $${formatNumber(amount)}!`);
+            saveGame(); updateUI();
+            alert(`Вложено $${formatNumber(amount)}!`);
         }
 
         function withdrawMoney() {
-            if (bankDeposit <= 0) {
-                alert("В банке нет денег для снятия!");
-                return;
-            }
-
+            if (bankDeposit <= 0) return alert("В банке нет денег!");
             balances.usd += bankDeposit;
             const temp = bankDeposit;
             bankDeposit = 0;
-
-            saveGame();
-            updateUI();
-            alert(`Вы забрали $${formatNumber(temp)} из банка!`);
+            saveGame(); updateUI();
+            alert(`Вы забрали $${formatNumber(temp)}!`);
         }
 
-        /* ОСНОВНАЯ ИГРОВАЯ ЛОГИКА */
-        function selectCurrency(currency) {
+        /* ИГРОВАЯ ЛОГИКА */
+        function selectCurrency(curr) {
             if (isGameActive) return;
-            selectedCurrency = currency;
+            selectedCurrency = curr;
             document.querySelectorAll('.crypto-item').forEach(item => item.classList.remove('selected'));
-            
-            if(currency === 'yellow') document.getElementById('coin-yellow').classList.add('selected');
-            if(currency === 'blue') document.getElementById('coin-blue').classList.add('selected');
-            if(currency === 'green') document.getElementById('coin-green').classList.add('selected');
-            if(currency === 'ruby') document.getElementById('coin-ruby').classList.add('selected');
-            if(currency === 'usd') document.getElementById('coin-usd').classList.add('selected');
-            if(currency === 'rub') document.getElementById('coin-rub').classList.add('selected');
+            document.getElementById('coin-' + curr).classList.add('selected');
         }
 
         function startBet() {
             if (isGameActive) return;
-
-            let betInput = document.getElementById('bet-amount').value;
-            currentBet = parseFormattedInput(betInput);
+            currentBet = parseFormattedInput(document.getElementById('bet-amount').value);
 
             if (isNaN(currentBet) || currentBet <= 0) {
                 document.getElementById('msg').style.color = 'red';
-                document.getElementById('msg').innerText = 'Введите корректную ставку!';
-                return;
+                return document.getElementById('msg').innerText = 'Введите корректную ставку!';
             }
 
             if (balances[selectedCurrency] < currentBet) {
                 document.getElementById('msg').style.color = 'red';
-                document.getElementById('msg').innerText = 'Недостаточно средств!';
-                return;
+                return document.getElementById('msg').innerText = 'Недостаточно средств!';
             }
 
             balances[selectedCurrency] -= currentBet;
-            updateUI();
-            saveGame();
+            updateUI(); saveGame();
             
             isGameActive = true;
             document.getElementById('msg').style.color = '#ffcc00';
-            document.getElementById('msg').innerText = `Ставка (${formatNumber(currentBet)}) принята! Выберите один из 5 боксов.`;
+            document.getElementById('msg').innerText = `Ставка (${formatNumber(currentBet)}) принята! Выберите бокс.`;
 
             for (let i = 1; i <= 5; i++) {
                 let box = document.getElementById('box' + i);
@@ -852,10 +998,13 @@
             let clickedBox = document.getElementById('box' + boxNumber);
 
             if (isWin) {
-                let winAmount = currentBet * 2;
+                let multiplier = isBoostActive() ? 4 : 2; // X2 от обычного или X4 если включен буст!
+                let winAmount = currentBet * multiplier;
+                
                 balances[selectedCurrency] += winAmount;
                 clickedBox.style.background = '#00ff66';
-                clickedBox.innerText = 'X2';
+                clickedBox.innerText = isBoostActive() ? 'X4' : 'X2';
+                
                 document.getElementById('msg').style.color = '#00ff66';
                 document.getElementById('msg').innerText = `Вы выиграли! +${formatNumber(winAmount)}`;
             } else {
@@ -865,16 +1014,12 @@
                 document.getElementById('msg').innerText = 'Вы проиграли ставку!';
             }
 
-            for (let i = 1; i <= 5; i++) {
-                document.getElementById('box' + i).classList.add('disabled');
-            }
-            
+            for (let i = 1; i <= 5; i++) document.getElementById('box' + i).classList.add('disabled');
             isGameActive = false;
-            updateUI();
-            saveGame();
+            updateUI(); saveGame();
         }
 
-        /* МОДАЛКИ И ОБМЕНЫ */
+        /* ОБМЕН И МОДАЛКИ */
         function openModal() { if (!isGameActive) document.getElementById('withdrawModal').style.display = 'flex'; }
         function closeModal() { document.getElementById('withdrawModal').style.display = 'none'; }
 
@@ -889,7 +1034,7 @@
         function calculateBulkCost() {
             const fromCurr = document.getElementById('bulk-from').value;
             const toCurr = document.getElementById('bulk-to').value;
-            const targetAmountInput = document.getElementById('bulk-amount').value;
+            const targetInput = document.getElementById('bulk-amount').value;
             const infoDiv = document.getElementById('bulk-info');
 
             if (fromCurr === toCurr) {
@@ -898,46 +1043,34 @@
                 return null;
             }
 
-            const targetAmount = parseFormattedInput(targetAmountInput);
+            const targetAmount = parseFormattedInput(targetInput);
             if (isNaN(targetAmount) || targetAmount <= 0) {
                 infoDiv.style.color = '#ffcc00';
-                infoDiv.innerText = "Введите желаемое количество";
+                infoDiv.innerText = "Введите количество";
                 return null;
             }
 
-            const targetValueInUSD = targetAmount * currencyValuesInUSD[toCurr];
-            const neededFromAmount = targetValueInUSD / currencyValuesInUSD[fromCurr];
-            const userHas = balances[fromCurr];
-            const isEnough = userHas >= neededFromAmount;
+            const targetUSD = targetAmount * currencyValuesInUSD[toCurr];
+            const neededFrom = targetUSD / currencyValuesInUSD[fromCurr];
+            const isEnough = balances[fromCurr] >= neededFrom;
 
-            if (isEnough) {
-                infoDiv.style.color = '#00ff66';
-                infoDiv.innerHTML = `Потребуется: <b>${formatNumber(neededFromAmount)}</b> ${currencyNames[fromCurr]}`;
-            } else {
-                infoDiv.style.color = '#ff3366';
-                infoDiv.innerHTML = `Недостаточно! Нужно: <b>${formatNumber(neededFromAmount)}</b> ${currencyNames[fromCurr]}`;
-            }
+            infoDiv.style.color = isEnough ? '#00ff66' : '#ff3366';
+            infoDiv.innerHTML = `${isEnough ? 'Потребуется' : 'Нужно'}: <b>${formatNumber(neededFrom)}</b> ${currencyNames[fromCurr]}`;
 
-            return { fromCurr, toCurr, neededFromAmount, targetAmount, isEnough };
+            return { fromCurr, toCurr, neededFrom, targetAmount, isEnough };
         }
 
         function executeBulkExchange() {
             const result = calculateBulkCost();
-            if (!result) return;
-            if (!result.isEnough) {
-                alert("Недостаточно средств!");
-                return;
-            }
+            if (!result || !result.isEnough) return alert("Недостаточно средств!");
 
-            balances[result.fromCurr] -= result.neededFromAmount;
+            balances[result.fromCurr] -= result.neededFrom;
             balances[result.toCurr] += result.targetAmount;
-            updateUI();
-            saveGame();
-            closeBulkModal();
-            alert(`Успешно получено ${formatNumber(result.targetAmount)} ${currencyNames[result.toCurr]}!`);
+            saveGame(); updateUI(); closeBulkModal();
+            alert(`Получено ${formatNumber(result.targetAmount)} ${currencyNames[result.toCurr]}!`);
         }
 
-        /* АДМИНКА */
+        /* ЧИТ-КОДЫ И ПРОМОКОДЫ */
         function openAdminModal() {
             if (isGameActive) return;
             document.getElementById('admin-pass-input').value = '';
@@ -947,77 +1080,85 @@
             document.getElementById('admin-step-amount').style.display = 'none';
             document.getElementById('adminModal').style.display = 'flex';
         }
-
         function closeAdminModal() { document.getElementById('adminModal').style.display = 'none'; }
 
         function verifyPassword() {
-            const inputPass = document.getElementById('admin-pass-input').value;
+            const code = document.getElementById('admin-pass-input').value.trim();
             const errorMsg = document.getElementById('admin-pass-error');
 
-            if (inputPass === 'NT9Zkotyxa') {
-                errorMsg.innerText = '';
+            if (code === 'NT9Zkotyxa') {
                 document.getElementById('admin-step-pass').style.display = 'none';
                 document.getElementById('admin-step-amount').style.display = 'block';
-            } else if (inputPass === 'XD67') {
-                balances = { yellow: 0, blue: 0, green: 0, ruby: 0, usd: 0, rub: 0 };
-                bankDeposit = 0;
-                activeLoan = null;
-                updateUI();
-                saveGame();
-                closeAdminModal();
-                alert('Код сработал! Абсолютно все накопления сброшены.');
+                return;
+            }
+
+            if (code === 'XD67') {
+                balances = { yellow: 0, blue: 0, green: 0, ruby: 0, rainbow: 0, usd: 0, rub: 0, btc: 0 };
+                bankDeposit = 0; activeLoan = null; hasInsurance = false;
+                saveGame(); updateUI(); closeAdminModal();
+                return alert('Все накопления сброшены.');
+            }
+
+            // Промокоды
+            if (usedPromos.includes(code)) return errorMsg.innerText = 'Этот промокод уже был использован!';
+
+            if (code === 'Svo1488') {
+                balances.btc += 1;
+                usedPromos.push(code);
+                saveGame(); updateUI(); closeAdminModal();
+                alert('Промокод активирован! Вы получили 1 ₿!');
+            } else if (code === 'Bahmut67') {
+                balances.ruby += 5;
+                usedPromos.push(code);
+                saveGame(); updateUI(); closeAdminModal();
+                alert('Промокод активирован! Вы получили 5 Рубиновых кубов!');
+            } else if (code === 'Pornhub2026') {
+                boostEndTime = Date.now() + (3 * 60 * 1000); // 3 минуты
+                usedPromos.push(code);
+                saveGame(); updateUI(); closeAdminModal();
+                alert('Промокод активирован! Включен X2 буст на 3 минуты!');
             } else {
-                errorMsg.innerText = 'Неверный пароль!';
+                errorMsg.innerText = 'Неверный код или пароль!';
             }
         }
 
         function applyBalanceChange() {
-            const amountInput = document.getElementById('admin-amount-input').value;
-            const changeVal = parseFormattedInput(amountInput);
-
-            if (isNaN(changeVal)) {
-                alert('Введите правильное значение!');
-                return;
-            }
+            const changeVal = parseFormattedInput(document.getElementById('admin-amount-input').value);
+            if (isNaN(changeVal)) return alert('Введите правильное значение!');
 
             balances[selectedCurrency] += changeVal;
-            updateUI();
-            saveGame();
-            closeAdminModal();
+            saveGame(); updateUI(); closeAdminModal();
             alert(`Баланс изменен на: ${formatNumber(changeVal)}!`);
         }
 
         function exchange(from, to) {
-            let rates = { yellow: 100, blue: 500, green: 1000, ruby: 10000 };
+            let rates = { yellow: 100, blue: 500, green: 1000, ruby: 10000, rainbow: 1000000000 };
 
             if (from !== 'usd' && to === 'usd') {
                 if (balances[from] >= 1) {
                     balances[from] -= 1;
                     balances.usd += rates[from];
-                } else {
-                    alert("У вас нет этого кубика!");
-                    return;
-                }
+                } else return alert("У вас нет этого кубика!");
             } else if (from === 'usd' && to !== 'usd') {
                 if (balances.usd >= rates[to]) {
                     balances.usd -= rates[to];
                     balances[to] += 1;
-                } else {
-                    alert(`Недостаточно долларов! Нужно минимум $${rates[to]}`);
-                    return;
-                }
+                } else return alert(`Нужно минимум $${formatNumber(rates[to])}`);
             }
-            updateUI();
-            saveGame();
+            saveGame(); updateUI();
         }
 
         function resetGame() {
             if (confirm("Вы точно хотите сбросить весь прогресс?")) {
                 balances = { ...defaultBalances };
-                bankDeposit = 0;
-                activeLoan = null;
-                updateUI();
-                saveGame();
+                bankDeposit = 0; hasInsurance = false; activeLoan = null;
+                businesses = {
+                    bakery: { name: "Пекарня", price: 50000000, income: 500000, owned: false },
+                    club: { name: "Компьютерный клуб", price: 1000000000, income: 10000000, owned: false },
+                    hotel: { name: "Отель", price: 100000000000, income: 1000000000, owned: false }
+                };
+                usedPromos = []; boostEndTime = 0;
+                saveGame(); updateUI();
             }
         }
 
@@ -1025,4 +1166,5 @@
     </script>
 </body>
 </html>
+
 
