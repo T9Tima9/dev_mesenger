@@ -3,1114 +3,1026 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DevGram Pro Online - Глобальная социальная сеть</title>
+    <title>Онлайн Казино с Сохранением</title>
     <style>
-        :root {
-            --tg-theme-bg: #0e1621;
-            --tg-theme-sidebar: #17212b;
-            --tg-theme-active: #2b5278;
-            --tg-theme-text: #f5f5f5;
-            --tg-theme-hint: #7f91a4;
-            --tg-theme-button: #2481cc;
-            --tg-theme-danger: #e53935;
+        body {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+            position: relative;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
-        body { background-color: var(--tg-theme-bg); color: var(--tg-theme-text); display: flex; height: 100vh; overflow: hidden; }
+        h1 {
+            color: #ffcc00;
+            font-size: 3rem;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+            margin-bottom: 10px;
+        }
 
-        /* Окно авторизации */
-        #authOverlay { position: fixed; top:0; left:0; width:100vw; height:100vh; background: var(--tg-theme-bg); z-index: 9999; display: flex; justify-content: center; align-items: center; }
-        .auth-card { background: var(--tg-theme-sidebar); padding: 30px; border-radius: 12px; width: 350px; display: flex; flex-direction: column; gap: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
-        .auth-card h2 { text-align: center; margin-bottom: 10px; }
-        .auth-card input { padding: 12px; background: var(--tg-theme-bg); border: 1px solid #223242; border-radius: 6px; color: white; outline: none; }
-        .auth-card button { padding: 12px; background: var(--tg-theme-button); border: none; border-radius: 6px; color: white; cursor: pointer; font-weight: bold; }
-        .auth-tabs { display: flex; gap: 10px; margin-bottom: 15px; }
-        .auth-tabs button { flex: 1; padding: 10px; background: transparent; border: 2px solid #223242; color: var(--tg-theme-hint); cursor: pointer; border-radius: 6px; }
-        .auth-tabs button.active { border-color: var(--tg-theme-button); color: var(--tg-theme-button); }
+        .balance-container {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #444;
+            text-align: center;
+            min-width: 340px;
+            margin-bottom: 20px;
+        }
+
+        .balance-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #bbb;
+        }
+
+        .currencies {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .crypto-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            border: 3px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #333;
+            min-width: 65px;
+        }
+
+        .crypto-item.selected {
+            border-color: #ff3366;
+            box-shadow: 0 0 15px #ff3366;
+            transform: scale(1.05);
+        }
+
+        .cube {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+        }
+        .yellow-cube { background-color: #ffd700; box-shadow: 0 0 10px #ffd700; }
+        .blue-cube { background-color: #00c8ff; box-shadow: 0 0 10px #00c8ff; }
+        .green-cube { background-color: #00ff66; box-shadow: 0 0 10px #00ff66; }
+        .ruby-cube { background-color: #ff0055; box-shadow: 0 0 10px #ff0055; }
         
-        .avatar-picker { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-        .avatar-preview { width: 80px; height: 80px; border-radius: 50%; background: #517da2; display: flex; align-items: center; justify-content: center; font-size: 30px; overflow: hidden; }
-        .avatar-preview img { width: 100%; height: 100%; object-fit: cover; }
-        .error-msg { color: var(--tg-theme-danger); font-size: 13px; text-align: center; display: none; }
-        .success-msg { color: #4ab54a; font-size: 13px; text-align: center; display: none; }
+        .currency-symbol {
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+        }
+        .dollar-sign { color: #2ecc71; }
+        .ruble-sign { color: #ff9900; }
 
-        /* Боковая панель */
-        .sidebar { width: 80px; background-color: var(--tg-theme-sidebar); display: flex; flex-direction: column; align-items: center; padding: 20px 0; border-right: 1px solid #101921; gap: 20px; justify-content: space-between; }
-        .sidebar-top { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
-        .logo-dev { font-size: 28px; font-weight: bold; color: var(--tg-theme-button); background: #2481cc22; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 15px; cursor: pointer; }
-        .nav-btn { background: none; border: none; color: var(--tg-theme-hint); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 11px; width: 100%; padding: 10px 0; }
-        .nav-btn.active { color: var(--tg-theme-button); background: #2481cc11; border-left: 3px solid var(--tg-theme-button); }
-        .nav-btn svg { width: 26px; height: 26px; fill: currentColor; }
+        .btn-link {
+            color: #00c8ff;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 1.1rem;
+            margin-top: 10px;
+            display: block;
+        }
 
-        /* Главная область */
-        .main-content { flex: 1; display: flex; position: relative; }
-        .screen { display: none; width: 100%; height: 100%; }
-        .screen.active { display: flex; }
+        .bank-btn-trigger {
+            color: #ffcc00;
+            border: 2px solid #ffcc00;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            margin-top: 15px;
+            display: inline-block;
+            font-weight: bold;
+            background: rgba(255, 204, 0, 0.1);
+        }
+        .bank-btn-trigger:hover { background: rgba(255, 204, 0, 0.3); }
 
-        /* Мессенджер */
-        .chats-list { width: 320px; background-color: var(--tg-theme-sidebar); border-right: 1px solid #101921; display: flex; flex-direction: column; }
-        .search-bar { padding: 15px; border-bottom: 1px solid #101921; display: flex; gap: 5px; }
-        .search-bar input { flex:1; padding: 8px; background: var(--tg-theme-bg); border: none; border-radius: 6px; color: white; }
-        .search-bar button { padding: 0 10px; background: var(--tg-theme-button); border: none; color: white; border-radius: 6px; cursor: pointer; }
-        .chats-container { flex: 1; overflow-y: auto; }
-        .chat-item { padding: 15px; display: flex; align-items: center; gap: 12px; cursor: pointer; border-bottom: 1px solid #101921; }
-        .chat-item:hover, .chat-item.active { background-color: var(--tg-theme-active); }
-        .avatar { width: 45px; height: 45px; border-radius: 50%; background: #517da2; overflow: hidden; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; }
-        .avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .chat-info { flex: 1; }
-        .chat-info h4 { margin-bottom: 3px; }
-        .chat-info p { font-size: 12px; color: var(--tg-theme-hint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        
-        .chat-window { flex: 1; display: flex; flex-direction: column; background: #0e1621; }
-        .chat-header { padding: 15px 20px; background: var(--tg-theme-sidebar); display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #101921; }
-        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        
-        .msg { max-width: 60%; padding: 10px 14px; border-radius: 12px; font-size: 14px; position: relative; word-wrap: break-word; }
-        .msg.in { background: var(--tg-theme-sidebar); align-self: flex-start; }
-        .msg.out { background: #2b5278; align-self: flex-end; }
-        .msg video, .msg img, .msg audio { max-width: 240px; display: block; border-radius: 8px; margin-top: 5px; }
-        .msg .circle-video { width: 160px; height: 160px; border-radius: 50%; object-fit: cover; }
+        .bet-section {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #444;
+            text-align: center;
+            width: 340px;
+            margin-bottom: 20px;
+        }
 
-        /* Панель ввода */
-        .chat-input-area { padding: 15px; background: var(--tg-theme-sidebar); display: flex; align-items: center; gap: 10px; position: relative; }
-        .chat-input-area input { flex: 1; padding: 10px 15px; background: var(--tg-theme-bg); border: none; border-radius: 8px; color: white; outline: none; }
-        .media-actions { display: flex; gap: 8px; }
-        .icon-btn { background: none; border: none; font-size: 20px; cursor: pointer; opacity: 0.7; }
-        .icon-btn:hover { opacity: 1; }
-        .icon-btn.recording { color: var(--tg-theme-danger); animation: blink 1s infinite; }
-        .send-btn-9 { background: var(--tg-theme-button); border: none; width: 38px; height: 38px; border-radius: 50%; color: white; font-size: 18px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .bet-section input, .modal-content input, .modal-content select {
+            width: 80%;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            text-align: center;
+            box-sizing: border-box;
+            background: #333;
+            color: white;
+        }
 
-        #cameraPreviewContainer { display: none; position: absolute; bottom: 70px; left: 20px; width: 150px; height: 150px; border-radius: 50%; overflow: hidden; border: 3px solid var(--tg-theme-button); }
-        #cameraPreviewContainer video { width: 100%; height: 100%; object-fit: cover; }
+        .main-btn {
+            background: #ff3366;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 85%;
+            transition: 0.2s;
+        }
+        .main-btn:hover { background: #ff5588; }
 
-        /* === ДЕВТОК (ВЕРТИКАЛЬНОЕ ВИДЕО) === */
-        .devtok-screen-wrapper { flex: 1; display: flex; justify-content: center; align-items: center; background: #000; position: relative; }
-        .devtok-viewport { width: 360px; height: 640px; background: #111; border-radius: 16px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.7); overflow: hidden; display: flex; align-items: center; justify-content: center; touch-action: none; }
+        .boxes-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            justify-content: center;
+        }
 
-        .video-card-vertical { width: 100%; height: 100%; position: absolute; top: 0; left: 0; display: none; background: #000; opacity: 0; transition: opacity 0.3s; }
-        .video-card-vertical.active { display: flex; opacity: 1; flex-direction: column; }
-        .video-card-vertical video { width: 100%; height: 100%; object-fit: cover; }
-        .video-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px; background: linear-gradient(transparent, rgba(0,0,0,0.9)); display: flex; justify-content: space-between; align-items: flex-end; z-index: 5; width: 100%; }
-        
-        .devtok-hint { position: absolute; bottom: 20px; right: 20px; color: #999; font-size: 12px; text-align: right; z-index: 10; }
+        .box {
+            width: 50px;
+            height: 50px;
+            background: #444;
+            border: 2px solid #666;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: 0.2s;
+        }
+        .box:hover { background: #555; }
+        .box.disabled { pointer-events: none; opacity: 0.6; }
 
-        .upload-floating-btn { position: absolute; top: 20px; right: 20px; background: var(--tg-theme-button); color: white; border: none; padding: 12px 24px; border-radius: 20px; cursor: pointer; font-weight: bold; z-index: 10; }
+        .system-msg {
+            margin-top: 15px;
+            font-weight: bold;
+            min-height: 24px;
+        }
 
-        /* Разрешения */
-        .system-request-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; justify-content: center; align-items: center; }
-        .modal-box { background: var(--tg-theme-sidebar); padding: 25px; border-radius: 12px; width: 320px; text-align: center; display: flex; flex-direction: column; gap: 15px; border: 1px solid var(--tg-theme-button); }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
 
-        /* ДевФул */
-        .devful-container { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 25px; }
-        .devful-header { display: flex; justify-content: space-between; align-items: center; }
-        .devful-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-        .video-card-horizontal { background: var(--tg-theme-sidebar); border-radius: 12px; overflow: hidden; cursor: pointer; transition: transform 0.2s; }
-        .video-card-horizontal:hover { transform: translateY(-5px); }
-        .video-card-horizontal video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; }
-        .horizontal-info { padding: 15px; }
-        .horizontal-info h3 { margin-bottom: 5px; }
-        .horizontal-info p { font-size: 12px; color: var(--tg-theme-hint); }
+        .modal-content {
+            background: #222;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #00c8ff;
+            width: 380px;
+            text-align: center;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
 
-        /* Кнопки Профиля / Настроек */
-        .profile-section { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px; padding-bottom: 10px; border-top: 1px solid #223242; padding-top: 10px; }
-        .settings-pane { background: var(--tg-theme-sidebar); padding: 20px; border-radius: 12px; display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 400px; margin: auto; }
-        .danger-btn { background: var(--tg-theme-danger) !important; }
+        .exchange-row {
+            margin: 10px 0;
+            padding: 8px;
+            background: #333;
+            border-radius: 8px;
+        }
 
-        .hidden-input { display: none; }
-        @keyframes blink { 50% { opacity: 0.4; } }
-        
-        .add-friend-btn { padding: 5px 12px; background: var(--tg-theme-button); border: none; color: white; border-radius: 6px; cursor: pointer; font-size: 12px; }
-    </style>
+        .exchange-row h4 { margin: 0 0 8px 0; font-size: 0.95rem; }
+
+        .ex-btn {
+            background: #00c8ff;
+            color: black;
+            border: none;
+            padding: 5px 10px;
+            margin: 2px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .ex-btn:hover { background: #55e0ff; }
+
+        .back-btn {
+            background: #555;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-top: 15px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .reset-btn {
+            background: transparent;
+            color: #555;
+            border: 1px solid #444;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 30px;
+        }
+        .reset-btn:hover { color: #ff3366; border-color: #ff3366; }
+
+        #robbery-alert {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(150, 0, 0, 0.9);
+            color: #ffffff;
+            font-size: 4rem;
+            font-weight: 900;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            text-shadow: 0 0 20px black;
+            box-sizing: border-box;
+            padding: 20px;
+        }
+
+        .bank-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .bank-tab {
+            flex: 1;
+            padding: 10px;
+            background: #333;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .bank-tab.active {
+            background: #ffcc00;
+            color: black;
+        }
     </style>
 </head>
 <body>
 
-    <div id="permissionModal" class="system-request-modal">
-        <div class="modal-box">
-            <h3>🔑 Запрос доступа к медиа</h3>
-            <p style="font-size:14px; color:var(--tg-theme-hint);">Для полноценной работы DevGram (запись видео, аудио и общение с друзьями) разрешите доступ к камере и микрофону.</p>
-            <button onclick="requestAllPermissions()" style="padding:12px; background:var(--tg-theme-button); border:none; color:white; border-radius:6px; font-weight:bold; cursor:pointer;">Активировать медиасистему</button>
+    <div id="robbery-alert">БАНК ОБОКРАЛИ!</div>
+
+    <h1>КАЗИНО</h1>
+
+    <div class="balance-container">
+        <div class="balance-title">Ваш Баланс</div>
+        <p style="font-size: 0.85rem; color: #888; margin-top:-10px;">(Кликните на валюту, чтобы выбрать для игры)</p>
+        <div class="currencies">
+            <div class="crypto-item selected" onclick="selectCurrency('yellow')" id="coin-yellow">
+                <div class="cube yellow-cube"></div>
+                <span id="bal-yellow">3</span>
+            </div>
+            <div class="crypto-item" onclick="selectCurrency('blue')" id="coin-blue">
+                <div class="cube blue-cube"></div>
+                <span id="bal-blue">0</span>
+            </div>
+            <div class="crypto-item" onclick="selectCurrency('green')" id="coin-green">
+                <div class="cube green-cube"></div>
+                <span id="bal-green">0</span>
+            </div>
+            <div class="crypto-item" onclick="selectCurrency('ruby')" id="coin-ruby">
+                <div class="cube ruby-cube"></div>
+                <span id="bal-ruby">0</span>
+            </div>
+            <div class="crypto-item" onclick="selectCurrency('usd')" id="coin-usd">
+                <div class="currency-symbol dollar-sign">$</div>
+                <span id="bal-usd">0</span>
+            </div>
+            <div class="crypto-item" onclick="selectCurrency('rub')" id="coin-rub">
+                <div class="currency-symbol ruble-sign">₽</div>
+                <span id="bal-rub">0</span>
+            </div>
+        </div>
+        
+        <div class="bank-btn-trigger" onclick="openBankModal()">🏦 БАНК (Кредиты & Вклады)</div>
+
+        <div class="btn-link" onclick="openModal()">Быстрый обмен (Кубы)</div>
+        <div class="btn-link" style="color: #00ff66;" onclick="openBulkModal()">Массовый перевод валюты</div>
+        <div class="btn-link" style="color: #ffcc00;" onclick="openAdminModal()">Админ-панель (Чит-код)</div>
+    </div>
+
+    <div class="bet-section">
+        <h3>Сделать Ставку</h3>
+        <input type="text" id="bet-amount" placeholder="Например: 100, 1k, 2.5m, 1kv" value="1">
+        <button class="main-btn" onclick="startBet()">Подтвердить ставку</button>
+        
+        <div class="system-msg" id="msg">Выберите валюту наверху, введите сумму и нажмите кнопку</div>
+
+        <div class="boxes-container">
+            <div class="box disabled" onclick="clickBox(1)" id="box1">?</div>
+            <div class="box disabled" onclick="clickBox(2)" id="box2">?</div>
+            <div class="box disabled" onclick="clickBox(3)" id="box3">?</div>
+            <div class="box disabled" onclick="clickBox(4)" id="box4">?</div>
+            <div class="box disabled" onclick="clickBox(5)" id="box5">?</div>
         </div>
     </div>
 
-    <div id="authOverlay" style="display:none;">
-        <!-- ВХОД -->
-        <div class="auth-card" id="loginPanel" style="display:none;">
-            <h2>Вход в DevGram</h2>
-            <div class="auth-tabs" style="margin-top:20px; margin-bottom:0;">
-                <button class="active" onclick="switchAuthTab('login')">Вход</button>
-                <button onclick="switchAuthTab('register')">Регистрация</button>
-            </div>
-            <input type="text" id="loginEmail" placeholder="Юзернейм или почта">
-            <input type="password" id="loginPassword" placeholder="Пароль">
-            <button onclick="loginUser()">Войти</button>
-            <div class="error-msg" id="loginError"></div>
-        </div>
-
-        <!-- РЕГИСТРАЦИЯ ШАГ 1 -->
-        <div class="auth-card" id="registerPanel" style="display:none;">
-            <h2>Регистрация</h2>
-            <div class="auth-tabs" style="margin-top:20px; margin-bottom:0;">
-                <button onclick="switchAuthTab('login')">Вход</button>
-                <button class="active" onclick="switchAuthTab('register')">Регистрация</button>
-            </div>
-            <p style="color:var(--tg-theme-hint); text-align:center; font-size:14px;">Шаг 1: Укажите почту</p>
-            <input type="email" id="regEmail" placeholder="example@mail.com">
-            <input type="text" id="regUsername" placeholder="@username">
-            <input type="password" id="regPassword" placeholder="Пароль (мин. 6 символов)">
-            <button onclick="startRegistration()">Отправить код на почту</button>
-            <div class="error-msg" id="regError"></div>
-            <div class="success-msg" id="regSuccess"></div>
-        </div>
-
-        <!-- РЕГИСТРАЦИЯ ШАГ 2 - КОД -->
-        <div class="auth-card" id="codePanel" style="display:none;">
-            <h2>Подтверждение почты</h2>
-            <p style="color:var(--tg-theme-hint); text-align:center; font-size:14px;" id="codeHint">Введите 6-значный код из письма</p>
-            <input type="text" id="confirmCode" placeholder="Код из письма" maxlength="6">
-            <button onclick="verifyCode()">Подтвердить код</button>
-            <button onclick="switchAuthTab('register')" style="background: transparent; color: var(--tg-theme-button); border: 1px solid var(--tg-theme-button);">Назад</button>
-            <div class="error-msg" id="codeError"></div>
-        </div>
-
-        <!-- РЕГИСТРАЦИЯ ШАГ 3 - ПРОФИЛЬ -->
-        <div class="auth-card" id="profilePanel" style="display:none;">
-            <h2>Завершение профиля</h2>
-            <div class="avatar-picker">
-                <div class="avatar-preview" id="avatarPreview">😎</div>
-                <button onclick="document.getElementById('avatarFile').click()" style="padding:5px 10px; font-size:12px; background:#313e4b;">Выбрать фото</button>
-                <input type="file" id="avatarFile" class="hidden-input" accept="image/*">
-            </div>
-            <button onclick="completeRegistration()" style="margin-top:10px;">Завершить регистрацию</button>
-            <button onclick="switchAuthTab('register')" style="background: transparent; color: var(--tg-theme-button); border: 1px solid var(--tg-theme-button);">Назад</button>
-            <div class="error-msg" id="profileError"></div>
-        </div>
-    </div>
-
-    <div class="sidebar" id="sidebar" style="display:none;">
-        <div class="sidebar-top">
-            <div class="logo-dev" title="DevGram">9</div>
-            <button class="nav-btn active" onclick="switchTab('messenger', this)">
-                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.54.36 2.98 1 4.28L2 22l5.72-1c1.3.64 2.74 1 4.28 1 5.52 0 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/></svg>
-                Чаты
-            </button>
-            <button class="nav-btn" onclick="switchTab('devtok', this)">
-                <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8 12.5v-9l6 4.5-6 4.5z"/></svg>
-                ДевТок
-            </button>
-            <button class="nav-btn" onclick="switchTab('devful', this)">
-                <svg viewBox="0 0 24 24"><path d="M21 3H3c-1.11 0-2 .89-2 2v14c0 1.1.89 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 12V9l5 3-5 3z"/></svg>
-                ДевФул
-            </button>
-            <button class="nav-btn" onclick="switchTab('settings', this)">
-                <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-                Профиль
-            </button>
-        </div>
-        <div class="profile-section">
-            <div class="avatar" style="width:35px; height:35px;" id="sidebarAvatar">?</div>
-        </div>
-    </div>
-
-    <div class="main-content" id="mainContent" style="display:none;">
-        <!-- МЕССЕНДЖЕР -->
-        <div id="messenger" class="screen active">
-            <div class="chats-list">
-                <div class="search-bar">
-                    <input type="text" id="userSearchInput" placeholder="Поиск @username...">
-                    <button onclick="searchUser()">Найти</button>
-                </div>
-                <div class="chats-container" id="chatsContainer"></div>
-            </div>
+    <!-- Модалка Банка -->
+    <div class="modal" id="bankModal">
+        <div class="modal-content" style="border-color: #ffcc00;">
+            <h3>Банковские Услуги</h3>
             
-            <div class="chat-window" id="chatWindow" style="display:none;">
-                <div class="chat-header">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <div class="avatar" id="activeChatAvatar"></div>
-                        <div>
-                            <h4 id="activeChatName">@username</h4>
-                            <p style="font-size:11px; color:var(--tg-theme-hint);" id="activeChatEmail"></p>
-                        </div>
-                    </div>
-                    <button class="add-friend-btn" id="chatFriendBtn" onclick="toggleFriendInChat()">В друзья</button>
+            <div class="bank-tabs">
+                <div class="bank-tab active" id="tab-loan-btn" onclick="switchBankTab('loan')">Кредит ($)</div>
+                <div class="bank-tab" id="tab-deposit-btn" onclick="switchBankTab('deposit')">Вклад ($)</div>
+            </div>
+
+            <!-- Вкладка Кредита -->
+            <div id="tab-loan">
+                <div id="loan-active-info" style="display: none; background: #333; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
+                    <p style="margin: 5px 0; color: #ffcc00;">Активный кредит!</p>
+                    <p style="margin: 5px 0;" id="loan-timer-display">Осталось времени: --:--</p>
+                    <p style="margin: 5px 0; font-size: 0.85rem;" id="loan-payback-display">К возврату: $0</p>
+                    <button class="main-btn" style="background: #2ecc71; margin-top: 10px; padding: 8px 15px; font-size: 1rem;" onclick="repayLoanEarly()">Погасить досрочно</button>
                 </div>
-                <div class="chat-messages" id="chatMessages"></div>
+
+                <div id="loan-form">
+                    <p style="font-size: 0.85rem; color: #aaa;">Макс. заем: 3x от ваших $ на балансе</p>
+                    <input type="text" id="loan-amount" placeholder="Сумма кредита ($)">
+                    
+                    <label style="font-size: 0.85rem; color: #aaa;">Срок займа:</label>
+                    <select id="loan-time">
+                        <option value="1">1 мин (+5%)</option>
+                        <option value="3">3 мин (+10%)</option>
+                        <option value="5">5 мин (+15%)</option>
+                        <option value="10">10 мин (+25%)</option>
+                    </select>
+
+                    <button class="main-btn" onclick="takeLoan()">Взять кредит</button>
+                </div>
+            </div>
+
+            <!-- Вкладка Депозита -->
+            <div id="tab-deposit" style="display: none;">
+                <p style="font-size: 0.85rem; color: #aaa;">Каждую минуту +5% к сумме. <br><span style="color: #ff3366;">Шанс 5%/мин, что банк обокрадут!</span></p>
+                <p style="font-size: 1.1rem; color: #00ff66;">В банке лежит: <b id="bank-deposit-amount">$0</b></p>
                 
-                <div class="chat-input-area">
-                    <div id="cameraPreviewContainer"><video id="cameraPreview" autoplay muted></video></div>
-                    <div class="media-actions">
-                        <button class="icon-btn" title="Фото" onclick="triggerChatFile('image')">📷</button>
-                        <button class="icon-btn" title="Видео" onclick="triggerChatFile('video')">🎥</button>
-                        <button class="icon-btn" id="voiceBtn" title="Голосовое">🎙️</button>
-                        <button class="icon-btn" id="circleBtn" title="Кружок">⭕</button>
-                    </div>
-                    <input type="text" id="messageInput" placeholder="Напишите сообщение...">
-                    <button class="send-btn-9" onclick="sendTextMessage()">9</button>
-                </div>
+                <input type="text" id="deposit-amount" placeholder="Сумма ($)">
+                <button class="main-btn" style="background: #00c8ff; margin-bottom: 10px;" onclick="depositMoney()">Вложить</button>
+                <button class="main-btn" style="background: #2ecc71;" onclick="withdrawMoney()">Забрать все</button>
             </div>
-            <div style="flex:1; display:flex; justify-content:center; align-items:center; color:var(--tg-theme-hint);" id="noChatPlaceholder">
-                Введите ник в поиске для начала чата
-            </div>
-        </div>
 
-        <!-- ДЕВТОК -->
-        <div id="devtok" class="screen">
-            <button class="upload-floating-btn" onclick="triggerUpload('devtok')">+ ДевТок</button>
-            <div class="devtok-screen-wrapper">
-                <div class="devtok-viewport" id="devtokViewport"></div>
-                <div class="devtok-hint">Свайп вверх/вниз для переключения</div>
-            </div>
-        </div>
-
-        <!-- ДЕВФУЛ -->
-        <div id="devful" class="screen">
-            <div class="devful-container">
-                <div class="devful-header">
-                    <h2>ДевФул — Длинные видео</h2>
-                    <button class="upload-floating-btn" style="position:static;" onclick="triggerUpload('devful')">+ Добавить видео</button>
-                </div>
-                <div class="devful-grid" id="devfulGrid"></div>
-            </div>
-        </div>
-
-        <!-- ПРОФИЛЬ -->
-        <div id="settings" class="screen" style="display:none; justify-content:center; align-items:center;">
-            <div class="settings-pane">
-                <h2 style="text-align:center;" id="settingsTitle">Мой Профиль</h2>
-                <div style="text-align:center; margin:20px 0;">
-                    <div class="avatar" style="width:80px; height:80px; margin:0 auto;" id="profileAvatar">?</div>
-                </div>
-                <p style="text-align:center; color:var(--tg-theme-hint);" id="settingsSub"></p>
-                
-                <button onclick="logOutAccount()" style="margin-top:10px;">Выйти из аккаунта</button>
-                <button onclick="deleteAccountPermanently()" class="danger-btn">❌ Удалить аккаунт</button>
-            </div>
+            <button class="back-btn" onclick="closeBankModal()">Закрыть</button>
         </div>
     </div>
 
-    <input type="file" id="chatFileLoader" class="hidden-input">
-    <input type="file" id="contentVideoLoader" class="hidden-input" accept="video/*">
+    <!-- Модалка быстрого вывода -->
+    <div class="modal" id="withdrawModal">
+        <div class="modal-content">
+            <h3>Быстрый Обмен Кубов</h3>
+            <div class="exchange-row">
+                <h4>Золотой кубик ↔ 100$</h4>
+                <button class="ex-btn" onclick="exchange('yellow', 'usd')">Кубик в $</button>
+                <button class="ex-btn" onclick="exchange('usd', 'yellow')">$ в Кубик</button>
+            </div>
+            <div class="exchange-row">
+                <h4>Алмазный кубик ↔ 500$</h4>
+                <button class="ex-btn" onclick="exchange('blue', 'usd')">Кубик в $</button>
+                <button class="ex-btn" onclick="exchange('usd', 'blue')">$ в Кубик</button>
+            </div>
+            <div class="exchange-row">
+                <h4>Изумрудный кубик ↔ 1 000$</h4>
+                <button class="ex-btn" onclick="exchange('green', 'usd')">Кубик в $</button>
+                <button class="ex-btn" onclick="exchange('usd', 'green')">$ в Кубик</button>
+            </div>
+            <div class="exchange-row">
+                <h4>Рубиновый кубик ↔ 10 000$</h4>
+                <button class="ex-btn" onclick="exchange('ruby', 'usd')">Кубик в $</button>
+                <button class="ex-btn" onclick="exchange('usd', 'ruby')">$ в Кубик</button>
+            </div>
+            <button class="back-btn" onclick="closeModal()">Назад</button>
+        </div>
+    </div>
+
+    <!-- Модалка Массового Перевода -->
+    <div class="modal" id="bulkModal">
+        <div class="modal-content" style="border-color: #00ff66;">
+            <h3>Массовый Перевод</h3>
+            <label style="font-size: 0.85rem; color: #aaa;">Из какой валюты отдаем:</label>
+            <select id="bulk-from" onchange="calculateBulkCost()">
+                <option value="yellow">Золотые кубики</option>
+                <option value="blue">Алмазные кубики</option>
+                <option value="green">Изумрудные кубики</option>
+                <option value="ruby">Рубиновые кубики</option>
+                <option value="usd">Доллары ($)</option>
+                <option value="rub">Рубли (₽)</option>
+            </select>
+
+            <label style="font-size: 0.85rem; color: #aaa;">В какую валюту переводим:</label>
+            <select id="bulk-to" onchange="calculateBulkCost()">
+                <option value="blue">Алмазные кубики</option>
+                <option value="yellow">Золотые кубики</option>
+                <option value="green">Изумрудные кубики</option>
+                <option value="ruby">Рубиновые кубики</option>
+                <option value="usd">Доллары ($)</option>
+                <option value="rub">Рубли (₽)</option>
+            </select>
+
+            <label style="font-size: 0.85rem; color: #aaa;">Сколько нужно ПОЛУЧИТЬ:</label>
+            <input type="text" id="bulk-amount" placeholder="Например: 1k, 500, 2m, 1kv" oninput="calculateBulkCost()">
+
+            <div id="bulk-info" style="margin: 10px 0; font-size: 0.95rem; color: #ffcc00; min-height: 40px;">
+                Введите число для расчета...
+            </div>
+
+            <button class="main-btn" onclick="executeBulkExchange()">Обменять</button>
+            <button class="back-btn" onclick="closeBulkModal()">Назад</button>
+        </div>
+    </div>
+
+    <!-- Модалка Админки -->
+    <div class="modal" id="adminModal">
+        <div class="modal-content" style="border-color: #ffcc00;">
+            <h3>Админ-панель</h3>
+            <div id="admin-step-pass">
+                <p>Введите пароль администратора:</p>
+                <input type="password" id="admin-pass-input" placeholder="Пароль">
+                <button class="main-btn" onclick="verifyPassword()">Войти</button>
+                <div id="admin-pass-error" style="color: #ff3366; margin-top: 10px; font-size: 0.9rem;"></div>
+            </div>
+
+            <div id="admin-step-amount" style="display: none;">
+                <p>Пароль подтвержден!</p>
+                <p style="font-size: 0.85rem; color: #aaa;">Введите сумму (поддерживаются K, M, B, T, P, E, KV, TR, SK, например: 500k, 1kv, -500):</p>
+                <input type="text" id="admin-amount-input" placeholder="Например: 500k или -1.5m">
+                <button class="main-btn" onclick="applyBalanceChange()">Применить</button>
+            </div>
+
+            <button class="back-btn" onclick="closeAdminModal()">Отмена</button>
+        </div>
+    </div>
+
+    <button class="reset-btn" onclick="resetGame()">Сбросить прогресс (Выдать 3 Золотых)</button>
 
     <script>
-        // ===== ГЛОБАЛЬНАЯ БД =====
-        const CloudDB = {
-            initDB: function() {
-                // Инициализируем глобальный реестр пользователей
-                if (!localStorage.getItem('dg_global_users')) {
-                    localStorage.setItem('dg_global_users', JSON.stringify({
-                        "@admin": { 
-                            username: "@admin", 
-                            email: "admin@example.com", 
-                            password: "admin123",
-                            avatar: "", 
-                            friends: [], 
-                            chats: {},
-                            deleted: false
-                        },
-                        "@boss": { 
-                            username: "@boss", 
-                            email: "boss@example.com", 
-                            password: "boss123",
-                            avatar: "", 
-                            friends: [], 
-                            chats: {},
-                            deleted: false
-                        }
-                    }));
+        const defaultBalances = { yellow: 3, blue: 0, green: 0, ruby: 0, usd: 0, rub: 0 };
+        let balances = {};
+
+        // Данные банка
+        let bankDeposit = 0;
+        let activeLoan = null;
+
+        // Эквивалент всех валют в Долларах ($)
+        const currencyValuesInUSD = { 
+            usd: 1, 
+            rub: 0.01, 
+            yellow: 100, 
+            blue: 500, 
+            green: 1000, 
+            ruby: 10000 
+        };
+        
+        const currencyNames = { 
+            usd: "Долларов ($)", 
+            rub: "Рублей (₽)", 
+            yellow: "Золотых кубиков", 
+            blue: "Алмазных кубиков", 
+            green: "Изумрудных кубиков", 
+            ruby: "Рубиновых кубиков" 
+        };
+
+        let selectedCurrency = 'yellow';
+        let currentBet = 0;
+        let isGameActive = false;
+
+        function formatNumber(num) {
+            if (num === 0) return "0";
+            const absNum = Math.abs(num);
+            const sign = num < 0 ? "-" : "";
+
+            const units = [
+                { value: 1e27, symbol: "SK" },
+                { value: 1e24, symbol: "TR" },
+                { value: 1e21, symbol: "KV" },
+                { value: 1e18, symbol: "E" },
+                { value: 1e15, symbol: "P" },
+                { value: 1e12, symbol: "T" },
+                { value: 1e9,  symbol: "B" },
+                { value: 1e6,  symbol: "M" },
+                { value: 1e3,  symbol: "K" }
+            ];
+
+            for (let i = 0; i < units.length; i++) {
+                if (absNum >= units[i].value) {
+                    let formatted = (absNum / units[i].value).toFixed(2);
+                    formatted = parseFloat(formatted).toString();
+                    return sign + formatted + units[i].symbol;
                 }
-                // Инициализируем видео
-                if (!localStorage.getItem('dg_global_devtok')) {
-                    localStorage.setItem('dg_global_devtok', JSON.stringify([
-                        { id: "v1", author: "@admin", src: "https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-light-in-a-futuristic-tunnel-41838-large.mp4", desc: "Первое видео в сети" },
-                        { id: "v2", author: "@boss", src: "https://assets.mixkit.co/videos/preview/mixkit-tunnel-of-futuristic-blue-lights-42205-large.mp4", desc: "Добро пожаловать в DevGram!" }
-                    ]));
+            }
+            return sign + absNum.toString();
+        }
+
+        function parseFormattedInput(str) {
+            if (typeof str !== 'string') str = String(str);
+            str = str.trim().toLowerCase().replace(',', '.');
+            if (!str) return NaN;
+
+            const multipliers = { 
+                'k': 1e3, 
+                'm': 1e6, 
+                'b': 1e9, 
+                't': 1e12, 
+                'p': 1e15, 
+                'e': 1e18,
+                'kv': 1e21,
+                'tr': 1e24,
+                'sk': 1e27
+            };
+
+            // Проверяем составные буквенные суффиксы (kv, tr, sk)
+            for (const key of ['sk', 'tr', 'kv']) {
+                if (str.endsWith(key)) {
+                    const numberPart = parseFloat(str.slice(0, -key.length));
+                    if (isNaN(numberPart)) return NaN;
+                    return Math.round(numberPart * multipliers[key]);
                 }
-                if (!localStorage.getItem('dg_global_devful')) {
-                    localStorage.setItem('dg_global_devful', JSON.stringify([]));
+            }
+
+            // Однобуквенные суффиксы
+            const lastChar = str.slice(-1);
+            if (multipliers[lastChar]) {
+                const numberPart = parseFloat(str.slice(0, -1));
+                if (isNaN(numberPart)) return NaN;
+                return Math.round(numberPart * multipliers[lastChar]);
+            }
+
+            const parsedVal = parseFloat(str);
+            return isNaN(parsedVal) ? NaN : Math.round(parsedVal);
+        }
+
+        function loadGame() {
+            const savedData = localStorage.getItem('casino_save_data');
+            if (savedData) {
+                balances = { ...defaultBalances, ...JSON.parse(savedData) };
+            } else {
+                balances = { ...defaultBalances };
+            }
+
+            bankDeposit = parseInt(localStorage.getItem('casino_bank_deposit') || '0');
+            const savedLoan = localStorage.getItem('casino_active_loan');
+            if (savedLoan) activeLoan = JSON.parse(savedLoan);
+
+            updateUI();
+        }
+
+        function saveGame() {
+            localStorage.setItem('casino_save_data', JSON.stringify(balances));
+            localStorage.setItem('casino_bank_deposit', bankDeposit.toString());
+            if (activeLoan) {
+                localStorage.setItem('casino_active_loan', JSON.stringify(activeLoan));
+            } else {
+                localStorage.removeItem('casino_active_loan');
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('bal-yellow').innerText = formatNumber(balances.yellow);
+            document.getElementById('bal-blue').innerText = formatNumber(balances.blue);
+            document.getElementById('bal-green').innerText = formatNumber(balances.green);
+            document.getElementById('bal-ruby').innerText = formatNumber(balances.ruby);
+            
+            // USD
+            if (balances.usd < 0) {
+                document.getElementById('bal-usd').innerText = "-" + formatNumber(Math.abs(balances.usd));
+            } else {
+                document.getElementById('bal-usd').innerText = formatNumber(balances.usd);
+            }
+
+            // RUB
+            if (balances.rub < 0) {
+                document.getElementById('bal-rub').innerText = "-" + formatNumber(Math.abs(balances.rub));
+            } else {
+                document.getElementById('bal-rub').innerText = formatNumber(balances.rub);
+            }
+
+            document.getElementById('bank-deposit-amount').innerText = "$" + formatNumber(bankDeposit);
+            updateLoanUI();
+        }
+
+        /* ТАЙМЕРЫ И БАНКОВСКИЕ ЦИКЛЫ */
+        setInterval(() => {
+            if (activeLoan) {
+                const now = Date.now();
+                if (now >= activeLoan.endTime) {
+                    balances.usd -= activeLoan.amountToPay;
+                    alert(`Время кредита истекло! С вашего счета списано $${formatNumber(activeLoan.amountToPay)}`);
+                    activeLoan = null;
+                    saveGame();
+                    updateUI();
+                } else {
+                    updateLoanUI();
                 }
-            },
-            getUsers: function() {
-                return JSON.parse(localStorage.getItem('dg_global_users') || '{}');
-            },
-            saveUsers: function(users) {
-                localStorage.setItem('dg_global_users', JSON.stringify(users));
-            },
-            getUser: function(username) {
-                return this.getUsers()[username] || null;
-            },
-            getUserByEmail: function(email) {
-                let users = this.getUsers();
-                for (let u in users) {
-                    if (users[u].email.toLowerCase() === email.toLowerCase()) {
-                        return users[u];
-                    }
+            }
+        }, 1000);
+
+        setInterval(() => {
+            if (bankDeposit > 0) {
+                if (Math.random() < 0.05) {
+                    bankDeposit = 0;
+                    saveGame();
+                    updateUI();
+                    triggerRobberyAlert();
+                } else {
+                    bankDeposit = Math.round(bankDeposit * 1.05);
+                    saveGame();
+                    updateUI();
                 }
+            }
+        }, 60000);
+
+        function triggerRobberyAlert() {
+            const alertElem = document.getElementById('robbery-alert');
+            alertElem.style.display = 'flex';
+            setTimeout(() => {
+                alertElem.style.display = 'none';
+            }, 5000);
+        }
+
+        /* БАНК */
+        function openBankModal() {
+            if (isGameActive) return;
+            document.getElementById('bankModal').style.display = 'flex';
+            updateLoanUI();
+        }
+
+        function closeBankModal() {
+            document.getElementById('bankModal').style.display = 'none';
+        }
+
+        function switchBankTab(tab) {
+            if (tab === 'loan') {
+                document.getElementById('tab-loan').style.display = 'block';
+                document.getElementById('tab-deposit').style.display = 'none';
+                document.getElementById('tab-loan-btn').classList.add('active');
+                document.getElementById('tab-deposit-btn').classList.remove('active');
+            } else {
+                document.getElementById('tab-loan').style.display = 'none';
+                document.getElementById('tab-deposit').style.display = 'block';
+                document.getElementById('tab-loan-btn').classList.remove('active');
+                document.getElementById('tab-deposit-btn').classList.add('active');
+            }
+        }
+
+        function takeLoan() {
+            if (activeLoan) {
+                alert("У вас уже есть невыплаченный кредит!");
+                return;
+            }
+
+            const inputVal = document.getElementById('loan-amount').value;
+            const amount = parseFormattedInput(inputVal);
+            const timeMinutes = parseInt(document.getElementById('loan-time').value);
+
+            if (isNaN(amount) || amount <= 0) {
+                alert("Введите правильную сумму кредита!");
+                return;
+            }
+
+            const maxLoanAllowed = Math.max(0, balances.usd * 3);
+
+            if (balances.usd <= 0 || amount > maxLoanAllowed) {
+                alert(`Вы можете взять в кредит не более 3х от вашего текущего $ баланса! (Максимум: $${formatNumber(maxLoanAllowed)})`);
+                return;
+            }
+
+            let percent = 0.05;
+            if (timeMinutes === 3) percent = 0.10;
+            if (timeMinutes === 5) percent = 0.15;
+            if (timeMinutes === 10) percent = 0.25;
+
+            const amountToPay = Math.round(amount * (1 + percent));
+            const endTime = Date.now() + (timeMinutes * 60 * 1000);
+
+            activeLoan = { amountToPay, endTime };
+            balances.usd += amount;
+
+            saveGame();
+            updateUI();
+            alert(`Кредит на $${formatNumber(amount)} получен! Вернуть через ${timeMinutes} мин: $${formatNumber(amountToPay)}`);
+        }
+
+        function repayLoanEarly() {
+            if (!activeLoan) return;
+
+            if (balances.usd < activeLoan.amountToPay) {
+                alert(`Недостаточно средств для погашения! Вам нужно: $${formatNumber(activeLoan.amountToPay)}`);
+                return;
+            }
+
+            balances.usd -= activeLoan.amountToPay;
+            const paidAmount = activeLoan.amountToPay;
+            activeLoan = null;
+
+            saveGame();
+            updateUI();
+            alert(`Кредит на сумму $${formatNumber(paidAmount)} успешно погашен досрочно!`);
+        }
+
+        function updateLoanUI() {
+            const activeInfo = document.getElementById('loan-active-info');
+            const loanForm = document.getElementById('loan-form');
+
+            if (activeLoan) {
+                activeInfo.style.display = 'block';
+                loanForm.style.display = 'none';
+
+                const timeLeftSec = Math.max(0, Math.floor((activeLoan.endTime - Date.now()) / 1000));
+                const mins = Math.floor(timeLeftSec / 60);
+                const secs = timeLeftSec % 60;
+
+                document.getElementById('loan-timer-display').innerText = `Осталось времени: ${mins}:${secs < 10 ? '0' : ''}${secs}`;
+                document.getElementById('loan-payback-display').innerText = `К возврату: $${formatNumber(activeLoan.amountToPay)}`;
+            } else {
+                activeInfo.style.display = 'none';
+                loanForm.style.display = 'block';
+            }
+        }
+
+        function depositMoney() {
+            const inputVal = document.getElementById('deposit-amount').value;
+            const amount = parseFormattedInput(inputVal);
+
+            if (isNaN(amount) || amount <= 0) {
+                alert("Введите корректную сумму для вклада!");
+                return;
+            }
+
+            if (balances.usd < amount) {
+                alert("Недостаточно долларов на балансе!");
+                return;
+            }
+
+            balances.usd -= amount;
+            bankDeposit += amount;
+            document.getElementById('deposit-amount').value = '';
+
+            saveGame();
+            updateUI();
+            alert(`Успешно положено на вклад $${formatNumber(amount)}!`);
+        }
+
+        function withdrawMoney() {
+            if (bankDeposit <= 0) {
+                alert("В банке нет денег для снятия!");
+                return;
+            }
+
+            balances.usd += bankDeposit;
+            const temp = bankDeposit;
+            bankDeposit = 0;
+
+            saveGame();
+            updateUI();
+            alert(`Вы забрали $${formatNumber(temp)} из банка!`);
+        }
+
+        /* ОСНОВНАЯ ИГРОВАЯ ЛОГИКА */
+        function selectCurrency(currency) {
+            if (isGameActive) return;
+            selectedCurrency = currency;
+            document.querySelectorAll('.crypto-item').forEach(item => item.classList.remove('selected'));
+            
+            if(currency === 'yellow') document.getElementById('coin-yellow').classList.add('selected');
+            if(currency === 'blue') document.getElementById('coin-blue').classList.add('selected');
+            if(currency === 'green') document.getElementById('coin-green').classList.add('selected');
+            if(currency === 'ruby') document.getElementById('coin-ruby').classList.add('selected');
+            if(currency === 'usd') document.getElementById('coin-usd').classList.add('selected');
+            if(currency === 'rub') document.getElementById('coin-rub').classList.add('selected');
+        }
+
+        function startBet() {
+            if (isGameActive) return;
+
+            let betInput = document.getElementById('bet-amount').value;
+            currentBet = parseFormattedInput(betInput);
+
+            if (isNaN(currentBet) || currentBet <= 0) {
+                document.getElementById('msg').style.color = 'red';
+                document.getElementById('msg').innerText = 'Введите корректную ставку!';
+                return;
+            }
+
+            if (balances[selectedCurrency] < currentBet) {
+                document.getElementById('msg').style.color = 'red';
+                document.getElementById('msg').innerText = 'Недостаточно средств!';
+                return;
+            }
+
+            balances[selectedCurrency] -= currentBet;
+            updateUI();
+            saveGame();
+            
+            isGameActive = true;
+            document.getElementById('msg').style.color = '#ffcc00';
+            document.getElementById('msg').innerText = `Ставка (${formatNumber(currentBet)}) принята! Выберите один из 5 боксов.`;
+
+            for (let i = 1; i <= 5; i++) {
+                let box = document.getElementById('box' + i);
+                box.classList.remove('disabled');
+                box.innerText = '?';
+                box.style.background = '#444';
+            }
+        }
+
+        function clickBox(boxNumber) {
+            if (!isGameActive) return;
+
+            let isWin = Math.random() < 0.5;
+            let clickedBox = document.getElementById('box' + boxNumber);
+
+            if (isWin) {
+                let winAmount = currentBet * 2;
+                balances[selectedCurrency] += winAmount;
+                clickedBox.style.background = '#00ff66';
+                clickedBox.innerText = 'X2';
+                document.getElementById('msg').style.color = '#00ff66';
+                document.getElementById('msg').innerText = `Вы выиграли! +${formatNumber(winAmount)}`;
+            } else {
+                clickedBox.style.background = '#ff3366';
+                clickedBox.innerText = '0';
+                document.getElementById('msg').style.color = '#ff3366';
+                document.getElementById('msg').innerText = 'Вы проиграли ставку!';
+            }
+
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById('box' + i).classList.add('disabled');
+            }
+            
+            isGameActive = false;
+            updateUI();
+            saveGame();
+        }
+
+        /* МОДАЛКИ И ОБМЕНЫ */
+        function openModal() { if (!isGameActive) document.getElementById('withdrawModal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('withdrawModal').style.display = 'none'; }
+
+        function openBulkModal() {
+            if (isGameActive) return;
+            document.getElementById('bulk-amount').value = '';
+            document.getElementById('bulk-info').innerText = 'Введите сумму...';
+            document.getElementById('bulkModal').style.display = 'flex';
+        }
+        function closeBulkModal() { document.getElementById('bulkModal').style.display = 'none'; }
+
+        function calculateBulkCost() {
+            const fromCurr = document.getElementById('bulk-from').value;
+            const toCurr = document.getElementById('bulk-to').value;
+            const targetAmountInput = document.getElementById('bulk-amount').value;
+            const infoDiv = document.getElementById('bulk-info');
+
+            if (fromCurr === toCurr) {
+                infoDiv.style.color = '#ff3366';
+                infoDiv.innerText = "Выберите разные валюты!";
                 return null;
-            },
-            getVideos: function(type) {
-                let key = 'dg_global_' + type;
-                return JSON.parse(localStorage.getItem(key) || '[]');
-            },
-            saveVideoList: function(type, list) {
-                localStorage.setItem('dg_global_' + type, JSON.stringify(list));
             }
-        };
 
-        // ===== ПЕРЕМЕННЫЕ СОСТОЯНИЯ =====
-        let currentUser = localStorage.getItem('dg_current_user') || null;
-        let activeChatUser = null;
-        let tempRegData = {};
-        let generatedCode = null;
-        let mediaRecorder = null;
-        let audioChunks = [];
-        let videoChunks = [];
-        let isRecordingVoice = false;
-        let isRecordingCircle = false;
-        let circleStream = null;
-        let currentDevTokIndex = 0;
-        let videoBlobsStorage = {};
-        let lastTouchY = 0;
+            const targetAmount = parseFormattedInput(targetAmountInput);
+            if (isNaN(targetAmount) || targetAmount <= 0) {
+                infoDiv.style.color = '#ffcc00';
+                infoDiv.innerText = "Введите желаемое количество";
+                return null;
+            }
 
-        // ===== ИНИЦИАЛИЗАЦИЯ =====
-        CloudDB.initDB();
+            const targetValueInUSD = targetAmount * currencyValuesInUSD[toCurr];
+            const neededFromAmount = targetValueInUSD / currencyValuesInUSD[fromCurr];
+            const userHas = balances[fromCurr];
+            const isEnough = userHas >= neededFromAmount;
 
-        window.onload = function() {
-            if (currentUser && !CloudDB.getUser(currentUser)?.deleted) {
-                initApp();
+            if (isEnough) {
+                infoDiv.style.color = '#00ff66';
+                infoDiv.innerHTML = `Потребуется: <b>${formatNumber(neededFromAmount)}</b> ${currencyNames[fromCurr]}`;
             } else {
-                currentUser = null;
-                localStorage.removeItem('dg_current_user');
-                showAuthScreen();
+                infoDiv.style.color = '#ff3366';
+                infoDiv.innerHTML = `Недостаточно! Нужно: <b>${formatNumber(neededFromAmount)}</b> ${currencyNames[fromCurr]}`;
             }
-            requestAllPermissions();
-        };
 
-        async function requestAllPermissions() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
-                stream.getTracks().forEach(t => t.stop());
-                document.getElementById('permissionModal').style.display = 'none';
-            } catch (err) {
-                // Сокрываем модаль даже если нет доступа
-                setTimeout(() => {
-                    document.getElementById('permissionModal').style.display = 'none';
-                }, 1500);
-            }
+            return { fromCurr, toCurr, neededFromAmount, targetAmount, isEnough };
         }
 
-        // ===== АУТЕНТИФИКАЦИЯ =====
-        function showAuthScreen() {
-            document.getElementById('authOverlay').style.display = 'flex';
-            document.getElementById('sidebar').style.display = 'none';
-            document.getElementById('mainContent').style.display = 'none';
-            switchAuthTab('login');
-        }
-
-        function switchAuthTab(tab) {
-            document.getElementById('loginPanel').style.display = 'none';
-            document.getElementById('registerPanel').style.display = 'none';
-            document.getElementById('codePanel').style.display = 'none';
-            document.getElementById('profilePanel').style.display = 'none';
-
-            document.querySelectorAll('.auth-tabs button').forEach(b => b.classList.remove('active'));
-
-            if (tab === 'login') {
-                document.getElementById('loginPanel').style.display = 'flex';
-                document.querySelectorAll('#loginPanel .auth-tabs button')[0].classList.add('active');
-                clearElement('loginError');
-            } else if (tab === 'register') {
-                document.getElementById('registerPanel').style.display = 'flex';
-                document.querySelectorAll('#registerPanel .auth-tabs button')[1].classList.add('active');
-                clearElement('regError');
-                clearElement('regSuccess');
+        function executeBulkExchange() {
+            const result = calculateBulkCost();
+            if (!result) return;
+            if (!result.isEnough) {
+                alert("Недостаточно средств!");
+                return;
             }
+
+            balances[result.fromCurr] -= result.neededFromAmount;
+            balances[result.toCurr] += result.targetAmount;
+            updateUI();
+            saveGame();
+            closeBulkModal();
+            alert(`Успешно получено ${formatNumber(result.targetAmount)} ${currencyNames[result.toCurr]}!`);
         }
 
-        function loginUser() {
-            const input = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value;
-            let user = null;
+        /* АДМИНКА */
+        function openAdminModal() {
+            if (isGameActive) return;
+            document.getElementById('admin-pass-input').value = '';
+            document.getElementById('admin-amount-input').value = '';
+            document.getElementById('admin-pass-error').innerText = '';
+            document.getElementById('admin-step-pass').style.display = 'block';
+            document.getElementById('admin-step-amount').style.display = 'none';
+            document.getElementById('adminModal').style.display = 'flex';
+        }
 
-            // Ищем по юзернейму или почте
-            if (input.startsWith('@')) {
-                user = CloudDB.getUser(input);
+        function closeAdminModal() { document.getElementById('adminModal').style.display = 'none'; }
+
+        function verifyPassword() {
+            const inputPass = document.getElementById('admin-pass-input').value;
+            const errorMsg = document.getElementById('admin-pass-error');
+
+            if (inputPass === 'NT9Zkotyxa') {
+                errorMsg.innerText = '';
+                document.getElementById('admin-step-pass').style.display = 'none';
+                document.getElementById('admin-step-amount').style.display = 'block';
+            } else if (inputPass === 'XD67') {
+                balances = { yellow: 0, blue: 0, green: 0, ruby: 0, usd: 0, rub: 0 };
+                bankDeposit = 0;
+                activeLoan = null;
+                updateUI();
+                saveGame();
+                closeAdminModal();
+                alert('Код сработал! Абсолютно все накопления сброшены.');
             } else {
-                user = CloudDB.getUserByEmail(input);
-            }
-
-            if (!user) {
-                showError('loginError', 'Пользователь не найден');
-                return;
-            }
-
-            if (user.deleted) {
-                showError('loginError', 'Этот аккаунт был удален');
-                return;
-            }
-
-            if (user.password !== password) {
-                showError('loginError', 'Неверный пароль');
-                return;
-            }
-
-            currentUser = user.username;
-            localStorage.setItem('dg_current_user', currentUser);
-            document.getElementById('authOverlay').style.display = 'none';
-            initApp();
-        }
-
-        function startRegistration() {
-            const email = document.getElementById('regEmail').value.trim();
-            const username = document.getElementById('regUsername').value.trim().toLowerCase();
-            const password = document.getElementById('regPassword').value;
-
-            clearElement('regError');
-            clearElement('regSuccess');
-
-            // Валидация
-            if (!email.includes('@')) {
-                showError('regError', 'Введите корректный email');
-                return;
-            }
-
-            if (!username.startsWith('@')) {
-                showError('regError', 'Юзернейм должен начинаться с @');
-                return;
-            }
-
-            if (username.length < 3) {
-                showError('regError', 'Юзернейм должен быть не менее 3 символов');
-                return;
-            }
-
-            if (password.length < 6) {
-                showError('regError', 'Пароль должен быть не менее 6 символов');
-                return;
-            }
-
-            let users = CloudDB.getUsers();
-            if (users[username]) {
-                showError('regError', 'Этот @username уже занят');
-                return;
-            }
-
-            if (CloudDB.getUserByEmail(email)) {
-                showError('regError', 'Этот email уже зарегистрирован');
-                return;
-            }
-
-            // Сохраняем временные данные
-            tempRegData = { email, username, password };
-
-            // Генерируем код подтверждения
-            generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
-
-            // Имитируем отправку на почту
-            alert(`[DevGram Почта]\n\nКод подтверждения: ${generatedCode}\n\nОтправлен на ${email}`);
-
-            document.getElementById('codeHint').textContent = `Код выслан на ${email}`;
-            document.getElementById('confirmCode').value = '';
-            document.getElementById('codePanel').style.display = 'flex';
-            document.getElementById('registerPanel').style.display = 'none';
-        }
-
-        function verifyCode() {
-            const code = document.getElementById('confirmCode').value;
-            clearElement('codeError');
-
-            if (code !== generatedCode) {
-                showError('codeError', 'Неверный код');
-                return;
-            }
-
-            // Переходим на следующий этап
-            document.getElementById('codePanel').style.display = 'none';
-            document.getElementById('profilePanel').style.display = 'flex';
-            document.getElementById('avatarPreview').innerHTML = '😎';
-        }
-
-        document.getElementById('avatarFile')?.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    tempRegData.avatar = event.target.result;
-                    document.getElementById('avatarPreview').innerHTML = `<img src="${event.target.result}">`;
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        function completeRegistration() {
-            let users = CloudDB.getUsers();
-
-            users[tempRegData.username] = {
-                username: tempRegData.username,
-                email: tempRegData.email,
-                password: tempRegData.password,
-                avatar: tempRegData.avatar || '',
-                friends: [],
-                chats: {},
-                deleted: false
-            };
-
-            CloudDB.saveUsers(users);
-
-            currentUser = tempRegData.username;
-            localStorage.setItem('dg_current_user', currentUser);
-
-            document.getElementById('authOverlay').style.display = 'none';
-            initApp();
-        }
-
-        // ===== ОСНОВНОЕ ПРИЛОЖЕНИЕ =====
-        function initApp() {
-            document.getElementById('authOverlay').style.display = 'none';
-            document.getElementById('sidebar').style.display = 'flex';
-            document.getElementById('mainContent').style.display = 'flex';
-
-            let user = CloudDB.getUser(currentUser);
-            if (!user) return;
-
-            // Обновляем аватар в сайдбаре
-            const sidebarAvatar = document.getElementById('sidebarAvatar');
-            if (user.avatar) {
-                sidebarAvatar.innerHTML = `<img src="${user.avatar}">`;
-            } else {
-                sidebarAvatar.textContent = user.username.substring(1, 3).toUpperCase();
-            }
-
-            // Обновляем профиль
-            const profileAvatar = document.getElementById('profileAvatar');
-            if (user.avatar) {
-                profileAvatar.innerHTML = `<img src="${user.avatar}">`;
-            } else {
-                profileAvatar.textContent = user.username.substring(1, 3).toUpperCase();
-            }
-
-            document.getElementById('settingsTitle').textContent = user.username;
-            document.getElementById('settingsSub').textContent = `Почта: ${user.email}`;
-
-            renderChatsList();
-            renderDevTok();
-            renderDevFul();
-            setupMediaHandlers();
-            setupDevTokSwipe();
-            playActiveDevTokVideo();
-        }
-
-        function switchTab(screenId, button) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-
-            document.getElementById(screenId).classList.add('active');
-            button.classList.add('active');
-
-            if (screenId === 'devtok') {
-                playActiveDevTokVideo();
-            } else {
-                stopAllVideos();
+                errorMsg.innerText = 'Неверный пароль!';
             }
         }
 
-        // ===== МЕССЕНДЖЕР =====
-        function searchUser() {
-            const searchVal = document.getElementById('userSearchInput').value.trim();
-            if (!searchVal) return;
+        function applyBalanceChange() {
+            const amountInput = document.getElementById('admin-amount-input').value;
+            const changeVal = parseFormattedInput(amountInput);
 
-            let username = searchVal.toLowerCase();
-            let user = null;
+            if (isNaN(changeVal)) {
+                alert('Введите правильное значение!');
+                return;
+            }
 
-            if (username.startsWith('@')) {
-                user = CloudDB.getUser(username);
-            } else if (username.includes('@')) {
-                user = CloudDB.getUserByEmail(username);
-                if (user) username = user.username;
-            } else {
-                user = CloudDB.getUser('@' + username);
-                if (!user) {
-                    user = CloudDB.getUserByEmail(searchVal);
-                    if (user) username = user.username;
+            balances[selectedCurrency] += changeVal;
+            updateUI();
+            saveGame();
+            closeAdminModal();
+            alert(`Баланс изменен на: ${formatNumber(changeVal)}!`);
+        }
+
+        function exchange(from, to) {
+            let rates = { yellow: 100, blue: 500, green: 1000, ruby: 10000 };
+
+            if (from !== 'usd' && to === 'usd') {
+                if (balances[from] >= 1) {
+                    balances[from] -= 1;
+                    balances.usd += rates[from];
                 } else {
-                    username = '@' + username;
+                    alert("У вас нет этого кубика!");
+                    return;
                 }
-            }
-
-            if (!user || user.deleted) {
-                alert('Пользователь не найден');
-                return;
-            }
-
-            if (username === currentUser) {
-                alert('Это вы сами!');
-                return;
-            }
-
-            openChat(username);
-        }
-
-        function openChat(username) {
-            let user = CloudDB.getUser(username);
-            if (!user || user.deleted) return;
-
-            activeChatUser = username;
-            document.getElementById('noChatPlaceholder').style.display = 'none';
-            document.getElementById('chatWindow').style.display = 'flex';
-            document.getElementById('activeChatName').textContent = username;
-            document.getElementById('activeChatEmail').textContent = user.email;
-
-            const avatarDiv = document.getElementById('activeChatAvatar');
-            if (user.avatar) {
-                avatarDiv.innerHTML = `<img src="${user.avatar}">`;
-            } else {
-                avatarDiv.textContent = username.substring(1, 3).toUpperCase();
-            }
-
-            const fBtn = document.getElementById('chatFriendBtn');
-            let me = CloudDB.getUser(currentUser);
-            if (me.friends && me.friends.includes(username)) {
-                fBtn.textContent = 'В друзьях';
-                fBtn.style.background = '#4ab54a';
-            } else {
-                fBtn.textContent = 'В друзья';
-                fBtn.style.background = 'var(--tg-theme-button)';
-            }
-
-            renderMessages();
-            renderChatsList();
-            document.getElementById('messageInput').focus();
-        }
-
-        function toggleFriendInChat() {
-            let me = CloudDB.getUser(currentUser);
-            if (!me.friends) me.friends = [];
-
-            if (me.friends.includes(activeChatUser)) {
-                me.friends = me.friends.filter(f => f !== activeChatUser);
-            } else {
-                me.friends.push(activeChatUser);
-            }
-
-            let users = CloudDB.getUsers();
-            users[currentUser] = me;
-            CloudDB.saveUsers(users);
-
-            openChat(activeChatUser);
-        }
-
-        function saveMessage(msgObj) {
-            let users = CloudDB.getUsers();
-            let me = users[currentUser];
-            let them = users[activeChatUser];
-
-            if (!me.chats) me.chats = {};
-            if (!them.chats) them.chats = {};
-            if (!me.chats[activeChatUser]) me.chats[activeChatUser] = [];
-            if (!them.chats[currentUser]) them.chats[currentUser] = [];
-
-            me.chats[activeChatUser].push(msgObj);
-            them.chats[currentUser].push(msgObj);
-
-            CloudDB.saveUsers(users);
-            renderMessages();
-            renderChatsList();
-        }
-
-        function renderMessages() {
-            const container = document.getElementById('chatMessages');
-            container.innerHTML = '';
-
-            let me = CloudDB.getUser(currentUser);
-            let history = me.chats?.[activeChatUser] || [];
-
-            history.forEach(m => {
-                const div = document.createElement('div');
-                div.className = `msg ${m.sender === currentUser ? 'out' : 'in'}`;
-
-                if (m.type === 'text') {
-                    div.textContent = m.content;
-                } else if (m.type === 'image') {
-                    div.innerHTML = `<img src="${m.content}">`;
-                } else if (m.type === 'video') {
-                    div.innerHTML = `<video src="${m.content}" controls style="max-width:240px;"></video>`;
-                } else if (m.type === 'voice') {
-                    div.innerHTML = `<audio src="${m.content}" controls></audio>`;
-                } else if (m.type === 'circle') {
-                    div.innerHTML = `<video class="circle-video" src="${m.content}" autoplay loop controls></video>`;
-                }
-
-                container.appendChild(div);
-            });
-
-            container.scrollTop = container.scrollHeight;
-        }
-
-        function renderChatsList() {
-            const container = document.getElementById('chatsContainer');
-            container.innerHTML = '';
-
-            let me = CloudDB.getUser(currentUser);
-            let myChats = me.chats || {};
-
-            Object.keys(myChats).forEach(username => {
-                let them = CloudDB.getUser(username);
-                if (!them || them.deleted) return;
-
-                const item = document.createElement('div');
-                item.className = `chat-item ${activeChatUser === username ? 'active' : ''}`;
-                item.onclick = () => openChat(username);
-
-                let lastMsg = myChats[username][myChats[username].length - 1];
-                let msgPreview = lastMsg.type === 'text' ? lastMsg.content : `[${lastMsg.type}]`;
-                if (msgPreview.length > 30) msgPreview = msgPreview.substring(0, 30) + '...';
-
-                item.innerHTML = `
-                    <div class="avatar">${them.avatar ? `<img src="${them.avatar}">` : username.substring(1, 3).toUpperCase()}</div>
-                    <div class="chat-info">
-                        <h4>${username}</h4>
-                        <p>${msgPreview}</p>
-                    </div>
-                `;
-                container.appendChild(item);
-            });
-        }
-
-        function sendTextMessage() {
-            const input = document.getElementById('messageInput');
-            if (!input.value.trim() || !activeChatUser) return;
-
-            saveMessage({
-                sender: currentUser,
-                type: 'text',
-                content: input.value
-            });
-
-            input.value = '';
-        }
-
-        function triggerChatFile(type) {
-            const loader = document.getElementById('chatFileLoader');
-            loader.accept = type === 'image' ? 'image/*' : 'video/*';
-            loader.onchange = function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        saveMessage({
-                            sender: currentUser,
-                            type: type,
-                            content: event.target.result
-                        });
-                    };
-                    reader.readAsDataURL(file);
-                }
-            };
-            loader.click();
-        }
-
-        function setupMediaHandlers() {
-            const voiceBtn = document.getElementById('voiceBtn');
-            const circleBtn = document.getElementById('circleBtn');
-
-            voiceBtn.onclick = async () => {
-                if (!isRecordingVoice) {
-                    try {
-                        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                        mediaRecorder = new MediaRecorder(stream);
-                        audioChunks = [];
-                        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-                        mediaRecorder.onstop = () => {
-                            const blob = new Blob(audioChunks, { type: 'audio/ogg;' });
-                            const reader = new FileReader();
-                            reader.onloadend = () => {
-                                saveMessage({
-                                    sender: currentUser,
-                                    type: 'voice',
-                                    content: reader.result
-                                });
-                            };
-                            reader.readAsDataURL(blob);
-                            stream.getTracks().forEach(t => t.stop());
-                        };
-                        mediaRecorder.start();
-                        isRecordingVoice = true;
-                        voiceBtn.classList.add('recording');
-                    } catch (e) {
-                        alert('Микрофон недоступен');
-                    }
+            } else if (from === 'usd' && to !== 'usd') {
+                if (balances.usd >= rates[to]) {
+                    balances.usd -= rates[to];
+                    balances[to] += 1;
                 } else {
-                    mediaRecorder.stop();
-                    isRecordingVoice = false;
-                    voiceBtn.classList.remove('recording');
+                    alert(`Недостаточно долларов! Нужно минимум $${rates[to]}`);
+                    return;
                 }
-            };
-
-            circleBtn.onclick = async () => {
-                if (!isRecordingCircle) {
-                    try {
-                        circleStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                        document.getElementById('cameraPreviewContainer').style.display = 'block';
-                        document.getElementById('cameraPreview').srcObject = circleStream;
-
-                        mediaRecorder = new MediaRecorder(circleStream);
-                        videoChunks = [];
-                        mediaRecorder.ondataavailable = e => videoChunks.push(e.data);
-                        mediaRecorder.onstop = () => {
-                            const blob = new Blob(videoChunks, { type: 'video/mp4' });
-                            const reader = new FileReader();
-                            reader.onloadend = () => {
-                                saveMessage({
-                                    sender: currentUser,
-                                    type: 'circle',
-                                    content: reader.result
-                                });
-                            };
-                            reader.readAsDataURL(blob);
-                            circleStream.getTracks().forEach(t => t.stop());
-                            document.getElementById('cameraPreviewContainer').style.display = 'none';
-                        };
-                        mediaRecorder.start();
-                        isRecordingCircle = true;
-                        circleBtn.classList.add('recording');
-                    } catch (e) {
-                        alert('Камера недоступна');
-                    }
-                } else {
-                    mediaRecorder.stop();
-                    isRecordingCircle = false;
-                    circleBtn.classList.remove('recording');
-                }
-            };
-        }
-
-        // ===== ДЕВТОК =====
-        function renderDevTok() {
-            const viewport = document.getElementById('devtokViewport');
-            viewport.innerHTML = '';
-
-            let toks = CloudDB.getVideos('devtok').filter(t => t.src || videoBlobsStorage[t.id]);
-            if (toks.length === 0) {
-                viewport.innerHTML = '<div style="color: #666; font-size: 14px;">Видео еще не загружены</div>';
-                return;
             }
-
-            if (currentDevTokIndex >= toks.length) {
-                currentDevTokIndex = 0;
-            }
-
-            toks.forEach((t, idx) => {
-                const card = document.createElement('div');
-                card.className = `video-card-vertical ${idx === currentDevTokIndex ? 'active' : ''}`;
-                card.setAttribute('data-index', idx);
-
-                let finalSrc = videoBlobsStorage[t.id] || t.src;
-
-                card.innerHTML = `
-                    <video src="${finalSrc}" autoplay muted playsinline></video>
-                    <div class="video-overlay">
-                        <div>
-                            <h3 style="margin:0; font-size:16px;">${t.author}</h3>
-                            <p style="margin:5px 0 0 0; font-size:13px; color:#ddd;">${t.desc || 'Видео'}</p>
-                        </div>
-                    </div>
-                `;
-                viewport.appendChild(card);
-            });
+            updateUI();
+            saveGame();
         }
 
-        function playActiveDevTokVideo() {
-            const cards = document.querySelectorAll('.video-card-vertical');
-            cards.forEach((card, idx) => {
-                const video = card.querySelector('video');
-                if (idx === currentDevTokIndex) {
-                    card.classList.add('active');
-                    if (video) {
-                        video.muted = false;
-                        video.play().catch(() => {});
-                    }
-                } else {
-                    card.classList.remove('active');
-                    if (video) video.pause();
-                }
-            });
-        }
-
-        function stopAllVideos() {
-            document.querySelectorAll('video').forEach(v => v.pause());
-        }
-
-        function setupDevTokSwipe() {
-            const viewport = document.getElementById('devtokViewport');
-            if (!viewport) return;
-
-            viewport.addEventListener('touchstart', (e) => {
-                lastTouchY = e.touches[0].clientY;
-            });
-
-            viewport.addEventListener('touchend', (e) => {
-                const currentY = e.changedTouches[0].clientY;
-                const diff = lastTouchY - currentY;
-                const toks = CloudDB.getVideos('devtok').filter(t => t.src || videoBlobsStorage[t.id]);
-
-                if (toks.length === 0) return;
-                if (Math.abs(diff) > 50) {
-                    if (diff > 0) {
-                        // Свайп вверх = новое видео (следующее)
-                        currentDevTokIndex = (currentDevTokIndex + 1) % toks.length;
-                    } else {
-                        // Свайп вниз = старое видео (предыдущее)
-                        currentDevTokIndex = (currentDevTokIndex - 1 + toks.length) % toks.length;
-                    }
-                    renderDevTok();
-                    playActiveDevTokVideo();
-                }
-            });
-
-            // Также поддерживаем колесо мыши
-            viewport.addEventListener('wheel', (e) => {
-                e.preventDefault();
-                const toks = CloudDB.getVideos('devtok').filter(t => t.src || videoBlobsStorage[t.id]);
-                if (toks.length === 0) return;
-                
-                if (e.deltaY > 0) {
-                    // Вниз на колесе = новое видео
-                    currentDevTokIndex = (currentDevTokIndex + 1) % toks.length;
-                } else {
-                    // Вверх на колесе = старое видео
-                    currentDevTokIndex = (currentDevTokIndex - 1 + toks.length) % toks.length;
-                }
-                renderDevTok();
-                playActiveDevTokVideo();
-            }, { passive: false });
-        }
-
-        // ===== ДЕВФУЛ =====
-        function renderDevFul() {
-            const grid = document.getElementById('devfulGrid');
-            grid.innerHTML = '';
-
-            let fuls = CloudDB.getVideos('devful').filter(f => f.src || videoBlobsStorage[f.id]);
-            if (fuls.length === 0) {
-                grid.innerHTML = '<div style="color: #666; padding: 20px;">Видео еще не загружены</div>';
-                return;
-            }
-
-            fuls.forEach(f => {
-                let finalSrc = videoBlobsStorage[f.id] || f.src;
-                const card = document.createElement('div');
-                card.className = 'video-card-horizontal';
-                card.innerHTML = `
-                    <video src="${finalSrc}" controls style="cursor: pointer;"></video>
-                    <div class="horizontal-info">
-                        <h3>${f.title}</h3>
-                        <p>📌 ${f.author}</p>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        // ===== ЗАГРУЗКА ВИДЕО =====
-        let uploadTarget = "";
-
-        function triggerUpload(target) {
-            uploadTarget = target;
-            document.getElementById('contentVideoLoader').click();
-        }
-
-        document.getElementById('contentVideoLoader').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const fileData = event.target.result;
-                const videoId = "video_" + Date.now();
-
-                if (uploadTarget === 'devtok') {
-                    let toks = CloudDB.getVideos('devtok');
-                    toks.unshift({
-                        id: videoId,
-                        author: currentUser,
-                        src: fileData,
-                        desc: file.name.split('.')[0]
-                    });
-                    CloudDB.saveVideoList('devtok', toks);
-
-                    currentDevTokIndex = 0;
-                    renderDevTok();
-                    playActiveDevTokVideo();
-                } else {
-                    let fuls = CloudDB.getVideos('devful');
-                    fuls.unshift({
-                        id: videoId,
-                        author: currentUser,
-                        src: fileData,
-                        title: file.name.split('.')[0]
-                    });
-                    CloudDB.saveVideoList('devful', fuls);
-                    renderDevFul();
-                }
-
-                alert('✅ Видео загружено в ленту!');
-                document.getElementById('contentVideoLoader').value = '';
-            };
-            reader.readAsDataURL(file);
-        });
-
-        // ===== ПРОФИЛЬ =====
-        function logOutAccount() {
-            if (confirm('Вы уверены, что хотите выйти?')) {
-                localStorage.removeItem('dg_current_user');
-                currentUser = null;
-                document.getElementById('authOverlay').style.display = 'flex';
-                document.getElementById('sidebar').style.display = 'none';
-                document.getElementById('mainContent').style.display = 'none';
-                showAuthScreen();
+        function resetGame() {
+            if (confirm("Вы точно хотите сбросить весь прогресс?")) {
+                balances = { ...defaultBalances };
+                bankDeposit = 0;
+                activeLoan = null;
+                updateUI();
+                saveGame();
             }
         }
 
-        function deleteAccountPermanently() {
-            if (confirm('⚠️ ВЫ УВЕРЕНЫ?\n\nУдаление аккаунта необратимо!\nВаш юзернейм будет полностью освобожден.')) {
-                if (confirm('Это последнее предупреждение. Удалить аккаунт ' + currentUser + '?')) {
-                    let users = CloudDB.getUsers();
-
-                    // Удаляем аккаунт полностью и убираем ссылки на него из других пользователей
-                    delete users[currentUser];
-                    for (let username in users) {
-                        const user = users[username];
-                        if (user.friends) {
-                            user.friends = user.friends.filter(f => f !== currentUser);
-                        }
-                        if (user.chats && user.chats[currentUser]) {
-                            delete user.chats[currentUser];
-                        }
-                    }
-
-                    CloudDB.saveUsers(users);
-                    localStorage.removeItem('dg_current_user');
-                    currentUser = null;
-
-                    alert('❌ Ваш аккаунт удален. Юзернейм теперь свободен.');
-                    location.reload();
-                }
-            }
-        }
-
-        // ===== УТИЛИТЫ =====
-        function showError(elementId, message) {
-            const el = document.getElementById(elementId);
-            if (el) {
-                el.textContent = message;
-                el.style.display = 'block';
-            }
-        }
-
-        function clearElement(elementId) {
-            const el = document.getElementById(elementId);
-            if (el) el.style.display = 'none';
-        }
-    </script>
+        loadGame();
     </script>
 </body>
 </html>
+
