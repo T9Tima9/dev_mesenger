@@ -361,11 +361,29 @@
             margin-top: 6px;
             user-select: none;
         }
+
+        /* Стиль для маленькой крутящейся картинки в углу */
+        .corner-spinner {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 100;
+            object-fit: cover;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
     </style>
 </head>
 <body>
 
     <div id="robbery-alert">БАНК ОБОКРАЛИ!</div>
+
+    <!-- Вращающаяся картинка image.png -->
+    <img src="image.png" alt="Bunny" class="corner-spinner" id="spinImage" onclick="rotateImage()">
 
     <h1>КАЗИНО</h1>
 
@@ -700,6 +718,7 @@
         let pashalkoEndTime = 0;
 
         let btcPrice = 50000;
+        let currentRotation = 0;
 
         let businesses = {
             bakery: { name: "Пекарня", price: 50000000, income: 500000, owned: false },
@@ -731,6 +750,11 @@
         let currentBet = 0;
         let isGameActive = false;
         let currentBoxResults = [];
+
+        function rotateImage() {
+            currentRotation += 360;
+            document.getElementById('spinImage').style.transform = `rotate(${currentRotation}deg)`;
+        }
 
         function isPashalkoActive() {
             return Date.now() < pashalkoEndTime;
@@ -847,14 +871,12 @@
             else localStorage.removeItem('casino_active_loan');
         }
 
-        /* Расчет оффлайн начислений для банка и бизнеса */
         function processOfflineProgress() {
             const now = Date.now();
             const elapsedMs = now - lastOnlineTime;
             const elapsedMinutes = Math.floor(elapsedMs / 60000);
 
             if (elapsedMinutes > 0) {
-                // 1. Оффлайн доход бизнеса
                 let totalBizIncome = 0;
                 if (businesses.bakery.owned || cheatBizEnabled) totalBizIncome += businesses.bakery.income;
                 if (businesses.club.owned || cheatBizEnabled) totalBizIncome += businesses.club.income;
@@ -864,10 +886,9 @@
                     balances.usd += totalBizIncome * elapsedMinutes;
                 }
 
-                // 2. Оффлайн Вклад в банке (+5% в мин)
                 if (bankDeposit > 0) {
                     for (let i = 0; i < elapsedMinutes; i++) {
-                        if (isPashalkoActive() || Math.random() < 0.05) { // Пасхалко = 100% кража
+                        if (isPashalkoActive() || Math.random() < 0.05) {
                             if (hasInsurance && !isPashalkoActive()) {
                                 hasInsurance = false;
                             } else {
@@ -901,14 +922,12 @@
             document.getElementById('bank-deposit-amount').innerText = "$" + formatNumber(bankDeposit);
             document.getElementById('insurance-status-text').innerHTML = `Страховка: <b>${hasInsurance ? 'АКТИВНА ✅' : 'Отсутствует ❌'}</b>`;
 
-            // Обновление видов бизнеса
             document.getElementById('biz-status-bakery').innerText = (businesses.bakery.owned || cheatBizEnabled) ? "Статус: Куплено" : "Статус: Не куплено";
             document.getElementById('biz-status-club').innerText = (businesses.club.owned || cheatBizEnabled) ? "Статус: Куплено" : "Статус: Не куплено";
             document.getElementById('biz-status-hotel').innerText = (businesses.hotel.owned || cheatBizEnabled) ? "Статус: Куплено" : "Статус: Не куплено";
 
             document.getElementById('cheat-panel-btn').style.display = isCheatPanelUnlocked ? 'inline-block' : 'none';
 
-            // Ручная установка биткоина при бурмальде
             document.getElementById('btc-manual-box').style.display = (Date.now() < btcManualEditEndTime) ? 'block' : 'none';
 
             updateCheatUI();
@@ -937,9 +956,7 @@
             }
         }
 
-        /* ТАЙМЕРЫ (1 сек и 1 мин) */
         setInterval(() => {
-            // Кредит
             if (activeLoan) {
                 if (Date.now() >= activeLoan.endTime) {
                     balances.usd -= activeLoan.amountToPay;
@@ -950,7 +967,6 @@
                 } else updateLoanUI();
             }
 
-            // X2 Буст таймер
             const boostDisplay = document.getElementById('boost-timer');
             if (cheatPermBoost) {
                 boostDisplay.style.display = 'block';
@@ -991,12 +1007,10 @@
         }
 
         setInterval(() => {
-            // 1. Динамический Биткоин
             generateBtcPriceForCurrentTime();
 
-            // 2. Банковский Вклад (+5% / x2 если буст)
             if (bankDeposit > 0) {
-                if (isPashalkoActive() || Math.random() < 0.05) { // Пасхалко активирует 100% кражу
+                if (isPashalkoActive() || Math.random() < 0.05) {
                     if (hasInsurance && !isPashalkoActive()) {
                         hasInsurance = false;
                         alert("Банк обокрали! Страховка сработала: деньги спасены, но страховка сгорела!");
@@ -1010,7 +1024,6 @@
                 }
             }
 
-            // 3. Доход от бизнеса
             let totalBizIncome = 0;
             if (businesses.bakery.owned || cheatBizEnabled) totalBizIncome += businesses.bakery.income;
             if (businesses.club.owned || cheatBizEnabled) totalBizIncome += businesses.club.income;
@@ -1030,7 +1043,6 @@
             setTimeout(() => { alertElem.style.display = 'none'; }, 5000);
         }
 
-        /* БИТКОИН */
         function openBtcModal() { if (!isGameActive) document.getElementById('btcModal').style.display = 'flex'; }
         function closeBtcModal() { document.getElementById('btcModal').style.display = 'none'; }
 
@@ -1070,7 +1082,6 @@
             alert(`Курс Биткоина установлен на $${formatNumber(btcPrice)}!`);
         }
 
-        /* БИЗНЕСЫ */
         function openBizModal() { if (!isGameActive) document.getElementById('bizModal').style.display = 'flex'; }
         function closeBizModal() { document.getElementById('bizModal').style.display = 'none'; }
 
@@ -1086,7 +1097,6 @@
             alert(`Вы успешно купили бизнес: ${biz.name}!`);
         }
 
-        /* БАНК & СТРАХОВКА */
         function openBankModal() { if (!isGameActive) document.getElementById('bankModal').style.display = 'flex'; updateLoanUI(); }
         function closeBankModal() { document.getElementById('bankModal').style.display = 'none'; }
 
@@ -1175,7 +1185,6 @@
             alert(`Вы забрали $${formatNumber(temp)}!`);
         }
 
-        /* ИГРОВАЯ ЛОГИКА */
         function selectCurrency(curr) {
             if (isGameActive) return;
             selectedCurrency = curr;
@@ -1204,7 +1213,6 @@
             document.getElementById('msg').style.color = '#ffcc00';
             document.getElementById('msg').innerText = `Ставка (${formatNumber(currentBet)}) принята! Выберите бокс.`;
 
-            // Генерируем исходы ящиков (если пасхалко — то гарантированный проигрыш)
             currentBoxResults = [];
             for (let i = 1; i <= 5; i++) {
                 let box = document.getElementById('box' + i);
@@ -1254,7 +1262,6 @@
             updateUI(); saveGame();
         }
 
-        /* ОБМЕН И МОДАЛКИ */
         function openModal() { if (!isGameActive) document.getElementById('withdrawModal').style.display = 'flex'; }
         function closeModal() { document.getElementById('withdrawModal').style.display = 'none'; }
 
@@ -1305,7 +1312,6 @@
             alert(`Получено ${formatNumber(result.targetAmount)} ${currencyNames[result.toCurr]}!`);
         }
 
-        /* ЧИТ-КОДЫ И ПРОМОКОДЫ */
         function openAdminModal() {
             if (isGameActive) return;
             document.getElementById('admin-pass-input').value = '';
@@ -1334,21 +1340,18 @@
                 return alert('Все накопления сброшены.');
             }
 
-            // Многоразовый код Чит-панели
             if (code === 'тцк52') {
                 isCheatPanelUnlocked = true;
                 saveGame(); updateUI(); closeAdminModal();
                 return alert('⚡ Чит-панель успешно разблокирована!');
             }
 
-            // Негативный промокод Пасхалко
             if (code.toLowerCase() === 'пасхалко') {
-                pashalkoEndTime = Date.now() + (3 * 60 * 1000); // 3 минуты проклятия
+                pashalkoEndTime = Date.now() + (3 * 60 * 1000);
                 saveGame(); updateUI(); closeAdminModal();
                 return alert('🍀 Удача на 3 минуты активирована!');
             }
 
-            // Промокоды
             if (!cheatReusablePromos && usedPromos.includes(code)) return errorMsg.innerText = 'Этот промокод уже был использован!';
 
             if (code === 'burmalda228') {
@@ -1376,7 +1379,6 @@
             }
         }
 
-        /* ЧИТ-ПАНЕЛЬ МЕНЮ */
         function openCheatPanelModal() { if (!isGameActive) document.getElementById('cheatPanelModal').style.display = 'flex'; }
         function closeCheatPanelModal() { document.getElementById('cheatPanelModal').style.display = 'none'; }
 
