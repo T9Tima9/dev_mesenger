@@ -353,6 +353,14 @@
         }
         .toggle-btn.off { background: #ff3366; color: white; }
         .toggle-btn.on { background: #00ff66; color: black; }
+
+        .faint-easteregg {
+            opacity: 0.15;
+            font-size: 0.75rem;
+            color: #ffcc00;
+            margin-top: 6px;
+            user-select: none;
+        }
     </style>
 </head>
 <body>
@@ -615,6 +623,7 @@
                 <input type="text" id="admin-pass-input" placeholder="Код / Пароль">
                 <button class="main-btn" onclick="verifyPassword()">Ввести</button>
                 <div id="admin-pass-error" style="color: #ff3366; margin-top: 10px; font-size: 0.9rem;"></div>
+                <div class="faint-easteregg">*Пасхалко*</div>
             </div>
 
             <div id="admin-step-amount" style="display: none;">
@@ -652,6 +661,18 @@
                 <button class="toggle-btn off" id="toggle-biz-btn" onclick="toggleCheatBiz()">ВЫКЛ🔴</button>
             </div>
 
+            <div style="background: #333; padding: 12px; border-radius: 8px; margin-bottom: 12px; text-align: left;">
+                <div style="font-weight: bold; margin-bottom: 5px;">4. Вечный X2 на всё</div>
+                <div style="font-size: 0.8rem; color: #aaa; margin-bottom: 8px;">Дает постоянный X2 мультипликатор выигрышей</div>
+                <button class="toggle-btn off" id="toggle-perm-boost-btn" onclick="toggleCheatPermBoost()">ВЫКЛ🔴</button>
+            </div>
+
+            <div style="background: #333; padding: 12px; border-radius: 8px; margin-bottom: 12px; text-align: left;">
+                <div style="font-weight: bold; margin-bottom: 5px;">5. Многоразовые чит-коды</div>
+                <div style="font-size: 0.8rem; color: #aaa; margin-bottom: 8px;">Вводить промокоды многократно без ограничений</div>
+                <button class="toggle-btn off" id="toggle-reusable-promos-btn" onclick="toggleCheatReusablePromos()">ВЫКЛ🔴</button>
+            </div>
+
             <button class="back-btn" onclick="closeCheatPanelModal()">Закрыть</button>
         </div>
     </div>
@@ -674,6 +695,9 @@
         let isCheatPanelUnlocked = false;
         let cheatBoxesEnabled = false;
         let cheatBizEnabled = false;
+        let cheatPermBoost = false;
+        let cheatReusablePromos = false;
+        let pashalkoEndTime = 0;
 
         let btcPrice = 50000;
 
@@ -707,6 +731,10 @@
         let currentBet = 0;
         let isGameActive = false;
         let currentBoxResults = [];
+
+        function isPashalkoActive() {
+            return Date.now() < pashalkoEndTime;
+        }
 
         function formatNumber(num) {
             if (num === 0) return "0";
@@ -790,6 +818,9 @@
             isCheatPanelUnlocked = localStorage.getItem('casino_cheat_unlocked') === 'true';
             cheatBoxesEnabled = localStorage.getItem('casino_cheat_boxes') === 'true';
             cheatBizEnabled = localStorage.getItem('casino_cheat_biz') === 'true';
+            cheatPermBoost = localStorage.getItem('casino_cheat_perm_boost') === 'true';
+            cheatReusablePromos = localStorage.getItem('casino_cheat_reusable_promos') === 'true';
+            pashalkoEndTime = parseInt(localStorage.getItem('casino_pashalko_end') || '0');
 
             processOfflineProgress();
             generateBtcPriceForCurrentTime();
@@ -808,6 +839,9 @@
             localStorage.setItem('casino_cheat_unlocked', isCheatPanelUnlocked.toString());
             localStorage.setItem('casino_cheat_boxes', cheatBoxesEnabled.toString());
             localStorage.setItem('casino_cheat_biz', cheatBizEnabled.toString());
+            localStorage.setItem('casino_cheat_perm_boost', cheatPermBoost.toString());
+            localStorage.setItem('casino_cheat_reusable_promos', cheatReusablePromos.toString());
+            localStorage.setItem('casino_pashalko_end', pashalkoEndTime.toString());
 
             if (activeLoan) localStorage.setItem('casino_active_loan', JSON.stringify(activeLoan));
             else localStorage.removeItem('casino_active_loan');
@@ -833,8 +867,8 @@
                 // 2. Оффлайн Вклад в банке (+5% в мин)
                 if (bankDeposit > 0) {
                     for (let i = 0; i < elapsedMinutes; i++) {
-                        if (Math.random() < 0.05) { // 5% шанс ограбления
-                            if (hasInsurance) {
+                        if (isPashalkoActive() || Math.random() < 0.05) { // Пасхалко = 100% кража
+                            if (hasInsurance && !isPashalkoActive()) {
                                 hasInsurance = false;
                             } else {
                                 bankDeposit = 0;
@@ -850,7 +884,7 @@
         }
 
         function isBoostActive() {
-            return Date.now() < boostEndTime;
+            return cheatPermBoost || Date.now() < boostEndTime;
         }
 
         function updateUI() {
@@ -889,6 +923,18 @@
             const btnBiz = document.getElementById('toggle-biz-btn');
             btnBiz.className = 'toggle-btn ' + (cheatBizEnabled ? 'on' : 'off');
             btnBiz.innerText = cheatBizEnabled ? 'ВКЛ🟢' : 'ВЫКЛ🔴';
+
+            const btnPermBoost = document.getElementById('toggle-perm-boost-btn');
+            if (btnPermBoost) {
+                btnPermBoost.className = 'toggle-btn ' + (cheatPermBoost ? 'on' : 'off');
+                btnPermBoost.innerText = cheatPermBoost ? 'ВКЛ🟢' : 'ВЫКЛ🔴';
+            }
+
+            const btnReusable = document.getElementById('toggle-reusable-promos-btn');
+            if (btnReusable) {
+                btnReusable.className = 'toggle-btn ' + (cheatReusablePromos ? 'on' : 'off');
+                btnReusable.innerText = cheatReusablePromos ? 'ВКЛ🟢' : 'ВЫКЛ🔴';
+            }
         }
 
         /* ТАЙМЕРЫ (1 сек и 1 мин) */
@@ -906,7 +952,10 @@
 
             // X2 Буст таймер
             const boostDisplay = document.getElementById('boost-timer');
-            if (isBoostActive()) {
+            if (cheatPermBoost) {
+                boostDisplay.style.display = 'block';
+                boostDisplay.innerText = `🔥 X2 МУЛЬТИПЛИКАТОР: ВЕЧНЫЙ⚡`;
+            } else if (Date.now() < boostEndTime) {
                 const leftSec = Math.ceil((boostEndTime - Date.now()) / 1000);
                 const m = Math.floor(leftSec / 60);
                 const s = leftSec % 60;
@@ -924,6 +973,11 @@
         }, 1000);
 
         function generateBtcPriceForCurrentTime() {
+            if (isPashalkoActive()) {
+                btcPrice = 50000;
+                document.getElementById('btc-rate-display').innerText = formatNumber(btcPrice);
+                return;
+            }
             if (Date.now() < btcManualEditEndTime) return;
             const currentMin = Math.floor(Date.now() / 60000);
             btcPrice = getDeterministicBtcPrice(currentMin);
@@ -942,8 +996,8 @@
 
             // 2. Банковский Вклад (+5% / x2 если буст)
             if (bankDeposit > 0) {
-                if (Math.random() < 0.05) { // 5% шанс ограбления
-                    if (hasInsurance) {
+                if (isPashalkoActive() || Math.random() < 0.05) { // Пасхалко активирует 100% кражу
+                    if (hasInsurance && !isPashalkoActive()) {
                         hasInsurance = false;
                         alert("Банк обокрали! Страховка сработала: деньги спасены, но страховка сгорела!");
                     } else {
@@ -1150,11 +1204,11 @@
             document.getElementById('msg').style.color = '#ffcc00';
             document.getElementById('msg').innerText = `Ставка (${formatNumber(currentBet)}) принята! Выберите бокс.`;
 
-            // Генерируем исходы ящиков сразу
+            // Генерируем исходы ящиков (если пасхалко — то гарантированный проигрыш)
             currentBoxResults = [];
             for (let i = 1; i <= 5; i++) {
                 let box = document.getElementById('box' + i);
-                let isWin = Math.random() < 0.5;
+                let isWin = isPashalkoActive() ? false : (Math.random() < 0.5);
                 currentBoxResults.push(isWin);
 
                 box.className = 'box';
@@ -1287,27 +1341,34 @@
                 return alert('⚡ Чит-панель успешно разблокирована!');
             }
 
+            // Негативный промокод Пасхалко
+            if (code.toLowerCase() === 'пасхалко') {
+                pashalkoEndTime = Date.now() + (3 * 60 * 1000); // 3 минуты проклятия
+                saveGame(); updateUI(); closeAdminModal();
+                return alert('🍀 Удача на 3 минуты активирована!');
+            }
+
             // Промокоды
-            if (usedPromos.includes(code)) return errorMsg.innerText = 'Этот промокод уже был использован!';
+            if (!cheatReusablePromos && usedPromos.includes(code)) return errorMsg.innerText = 'Этот промокод уже был использован!';
 
             if (code === 'burmalda228') {
                 btcManualEditEndTime = Date.now() + 60000;
-                usedPromos.push(code);
+                if (!cheatReusablePromos) usedPromos.push(code);
                 saveGame(); updateUI(); closeAdminModal();
                 alert('Промокод активирован! Вы можете 1 минуту менять курс Биткоина!');
             } else if (code === 'Svo1488') {
                 balances.btc += 1;
-                usedPromos.push(code);
+                if (!cheatReusablePromos) usedPromos.push(code);
                 saveGame(); updateUI(); closeAdminModal();
                 alert('Промокод активирован! Вы получили 1 ₿!');
             } else if (code === 'Bahmut67') {
                 balances.ruby += 5;
-                usedPromos.push(code);
+                if (!cheatReusablePromos) usedPromos.push(code);
                 saveGame(); updateUI(); closeAdminModal();
                 alert('Промокод активирован! Вы получили 5 Рубиновых кубов!');
             } else if (code === 'Pornhub2026') {
                 boostEndTime = Date.now() + (3 * 60 * 1000);
-                usedPromos.push(code);
+                if (!cheatReusablePromos) usedPromos.push(code);
                 saveGame(); updateUI(); closeAdminModal();
                 alert('Промокод активирован! Включен X2 буст на 3 минуты!');
             } else {
@@ -1326,6 +1387,16 @@
 
         function toggleCheatBiz() {
             cheatBizEnabled = !cheatBizEnabled;
+            saveGame(); updateUI();
+        }
+
+        function toggleCheatPermBoost() {
+            cheatPermBoost = !cheatPermBoost;
+            saveGame(); updateUI();
+        }
+
+        function toggleCheatReusablePromos() {
+            cheatReusablePromos = !cheatReusablePromos;
             saveGame(); updateUI();
         }
 
@@ -1378,6 +1449,7 @@
                 };
                 usedPromos = []; boostEndTime = 0;
                 isCheatPanelUnlocked = false; cheatBoxesEnabled = false; cheatBizEnabled = false;
+                cheatPermBoost = false; cheatReusablePromos = false; pashalkoEndTime = 0;
                 saveGame(); updateUI();
             }
         }
@@ -1386,3 +1458,4 @@
     </script>
 </body>
 </html>
+
